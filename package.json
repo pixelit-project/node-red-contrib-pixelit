@@ -1,0 +1,28 @@
+{
+    "name": "node-red-contrib-pixelit",
+    "version": "0.2.8",
+    "description": "Pixel it Project",
+    "dependencies": {
+        "request": "^2.88.0",
+        "sync-request": "^6.0.0",
+        "bluebird": "^3.3.4"
+    },
+    "engines": {
+        "node": ">=5.0.0"
+    },
+    "license": "MIT",
+    "keywords": [
+        "node-red",
+        "Pixel It",
+        "LED Matrix",
+        "WS2812B"
+    ],
+    "node-red": {
+        "nodes": {
+            "pixelit": "pixelit/pixelit.js"
+        }
+    },
+    "author": {
+        "name": "Dennis Hinzpeter"
+    }
+}
