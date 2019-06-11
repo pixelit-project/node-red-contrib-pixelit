@@ -11,6 +11,9 @@
         "node": ">=5.0.0"
     },
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/o0shojo0o/node-red-contrib-pixelit.git"
     "keywords": [
         "node-red",
         "Pixel It",
