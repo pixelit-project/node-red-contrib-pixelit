@@ -3,14 +3,18 @@
         category: 'Pixel It',
         color: '#9876d3',
         defaults: {
-            name: { value: "Core" },
+            name: {
+                value: "Core"
+            },
             ip: {
-                value: "",
-                required: true
+                value: ""
+            },
+            masterTopic: {
+                value: ""
             }
         },
         inputs: 1,
-        outputs: 0,
+        outputs: 1,
         icon: "spaceInvader.png",
         label: function () {
             return this.name || "Core";
@@ -22,10 +26,14 @@
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
-    </div>  
-    <div class="form-row">
+    </div>      
+    <div class="form-row">        
         <label for="node-input-ip"><i class="icon-tag"></i> IP-Address</label>
-        <input type="text" id="node-input-ip" placeholder="Pixel It IP-Address">
+        <input type="text" id="node-input-ip" placeholder="IP-Address (Optional)">        
+    </div>      
+    <div class="form-row">  
+        <label for="node-input-masterTopic"><i class="icon-tag"></i> Master-Topic</label>       
+        <input type="text" id="node-input-masterTopic" placeholder="Master-Topic (Optional)">
     </div>  
 </script>
 
@@ -40,7 +48,9 @@
         category: 'Pixel It',
         color: '#1abc9c',
         defaults: {
-            name: { value: "Alert Screen" },
+            name: {
+                value: "Alert Screen"
+            },
         },
         inputs: 1,
         outputs: 1,
@@ -68,7 +78,9 @@
         category: 'Pixel It',
         color: '#1abc9c',
         defaults: {
-            name: { value: "Screen Data Update" },
+            name: {
+                value: "Screen Data Update"
+            },
         },
         inputs: 1,
         outputs: 1,
@@ -97,7 +109,9 @@
         category: 'Pixel It',
         color: '#1abc9c',
         defaults: {
-            name: { value: "Matrix Control" },
+            name: {
+                value: "Matrix Control"
+            },
         },
         inputs: 1,
         outputs: 1,
@@ -125,7 +139,9 @@
         category: 'Pixel It',
         color: '#1abc9c',
         defaults: {
-            name: { value: "Playlist Update" }
+            name: {
+                value: "Playlist Update"
+            }
         },
         inputs: 1,
         outputs: 1,
@@ -153,7 +169,9 @@
         category: 'Pixel It',
         color: '#ff823a',
         defaults: {
-            name: { value: "Matrix Config" },
+            name: {
+                value: "Matrix Config"
+            },
             matrixtBrightness: {
                 value: 85,
                 required: true
@@ -316,9 +334,15 @@
         category: 'Pixel It',
         color: '#47c0e8',
         defaults: {
-            name: { value: "Switch Animation" },
-            aktiv: { value: "false" },
-            animation: { value: "fade" }
+            name: {
+                value: "Switch Animation"
+            },
+            aktiv: {
+                value: "false"
+            },
+            animation: {
+                value: "fade"
+            }
         },
         inputs: 1,
         outputs: 1,
@@ -360,9 +384,15 @@
         category: 'Pixel It',
         color: '#47c0e8',
         defaults: {
-            name: { value: "Screen Init" },
-            inscreenName: { value: "" },
-            induration: { value: "10" }
+            name: {
+                value: "Screen Init"
+            },
+            inscreenName: {
+                value: ""
+            },
+            induration: {
+                value: "10"
+            }
         },
         inputs: 1,
         outputs: 1,
@@ -398,17 +428,39 @@
         category: 'Pixel It',
         color: '#47c0e8',
         defaults: {
-            name: { value: "Text" },
-            intextString: { value: "Pixel!!!" },
-            inbigFont: { value: "false" },
-            inscrollText: { value: "false" },
-            inscrollTextDelay: { value: "0" },
-            incenterText: { value: "false" },
-            inposX: { value: "7" },
-            inposY: { value: "1" },
-            incolorR: { value: "255" },
-            incolorG: { value: "255" },
-            incolorB: { value: "255" }
+            name: {
+                value: "Text"
+            },
+            intextString: {
+                value: "Pixel!!!"
+            },
+            inbigFont: {
+                value: "false"
+            },
+            inscrollText: {
+                value: "false"
+            },
+            inscrollTextDelay: {
+                value: "0"
+            },
+            incenterText: {
+                value: "false"
+            },
+            inposX: {
+                value: "7"
+            },
+            inposY: {
+                value: "1"
+            },
+            incolorR: {
+                value: "255"
+            },
+            incolorG: {
+                value: "255"
+            },
+            incolorB: {
+                value: "255"
+            }
         },
         inputs: 1,
         outputs: 1,
@@ -487,12 +539,24 @@
         category: 'Pixel It',
         color: '#47c0e8',
         defaults: {
-            name: { value: "Bitmap" },
-            indata: { value: "" },
-            inposX: { value: "0" },
-            inposY: { value: "0" },
-            inwidth: { value: "8" },
-            inheight: { value: "8" }
+            name: {
+                value: "Bitmap"
+            },
+            indata: {
+                value: ""
+            },
+            inposX: {
+                value: "0"
+            },
+            inposY: {
+                value: "0"
+            },
+            inwidth: {
+                value: "8"
+            },
+            inheight: {
+                value: "8"
+            }
         },
         inputs: 1,
         outputs: 1,
@@ -540,11 +604,21 @@
         category: 'Pixel It',
         color: '#47c0e8',
         defaults: {
-            name: { value: "Bitmap Animation" },
-            indata: { value: "" },
-            inanimationDelay: { value: "100" },
-            inrubberbanding: { value: "false" },
-            inlimitLoops: { value: "0" }
+            name: {
+                value: "Bitmap Animation"
+            },
+            indata: {
+                value: ""
+            },
+            inanimationDelay: {
+                value: "100"
+            },
+            inrubberbanding: {
+                value: "false"
+            },
+            inlimitLoops: {
+                value: "0"
+            }
         },
         inputs: 1,
         outputs: 1,
@@ -591,13 +665,27 @@
         category: 'Pixel It',
         color: '#47c0e8',
         defaults: {
-            name: { value: "Clock" },
-            inswitchAktiv: { value: "true" },
-            inswitchSec: { value: "5" },
-            inwithSeconds: { value: "false" },
-            incolorR: { value: "255" },
-            incolorG: { value: "255" },
-            incolorB: { value: "255" }
+            name: {
+                value: "Clock"
+            },
+            inswitchAktiv: {
+                value: "true"
+            },
+            inswitchSec: {
+                value: "5"
+            },
+            inwithSeconds: {
+                value: "false"
+            },
+            incolorR: {
+                value: "255"
+            },
+            incolorG: {
+                value: "255"
+            },
+            incolorB: {
+                value: "255"
+            }
         },
         inputs: 1,
         outputs: 1,
@@ -647,4 +735,67 @@
 
 <script type="text/x-red" data-help-name="Clock">
     <p>For more information please visit the <a href="https://www.bastelbunker.de/pixel-it/">Blog</a>, <a href="https://wiki.dietru.de/books/pixel-it/page/clock-node">Wiki</a> or <a href="https://forum.bastelbunker.de/t/pixel-it">Forum</a></p>    
+</script>
+
+<!-- Sound -->
+<script type="text/javascript">
+    RED.nodes.registerType('Sound', {
+        category: 'Pixel It',
+        color: '#47c0e8',
+        defaults: {
+            name: {
+                value: "Sound"
+            },
+            inControl: {
+                value: "play"
+            },
+            inVolume: {
+                value: "15"
+            },
+            inFolder: {
+                value: "0"
+            },
+            inFile: {
+                value: "1"
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "spaceInvader.png",
+        label: function () {
+            return this.name || "Sound";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="Sound">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inControl"><i class="icon-tag"></i> Control</label>
+        <select id="node-input-inControl">
+            <option value="play">Play</option>
+            <option value="pause">Pause</option>
+            <option value="next">Next</option>
+            <option value="previous">Previous</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-inVolume"><i class="icon-tag"></i> Volume</label>
+        <input type="number" min="0" max="30" id="node-input-inVolume" placeholder="Volume">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inFolder"><i class="icon-tag"></i> Folder</label>
+        <input type="number" id="node-input-inFolder" placeholder="Folder">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inFile"><i class="icon-tag"></i> File</label>
+        <input type="number" id="node-input-inFile" placeholder="File">
+    </div>      
+</script>
+
+<script type="text/x-red" data-help-name="Sound">
+    <p>For more information please visit the <a href="https://www.bastelbunker.de/pixel-it/">Blog</a>, <a href="https://wiki.dietru.de/books/pixel-it/page/dfplayer-mini-mp3-player">Wiki</a> or <a href="https://forum.bastelbunker.de/t/pixel-it">Forum</a></p>    
 </script>
