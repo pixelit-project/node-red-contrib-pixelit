@@ -25,7 +25,6 @@ module.exports = function (RED) {
 
             // Check is IP Config?!
             if (config.ip === undefined || config.ip === '') {
-                //node.status({ fill: "red", shape: "dot", text: "Please set IP-Address" });
                 sendOverHTTPAktiv = false;
             }
 
@@ -129,7 +128,6 @@ module.exports = function (RED) {
                     shape: "ring",
                     text: status
                 });
-                //node.send(CreateJson(msg));
                 SendToPixelItScreen(CreateScreenJson(msg));
             }
 
@@ -179,7 +177,6 @@ module.exports = function (RED) {
                         }
 
                         context.set("timeout", setTimeout(GetNextScreen, (msg.duration * 1000)));
-                        //node.send(CreateJson(msg));
                         SendToPixelItScreen(CreateScreenJson(msg));
                     }
                 }
