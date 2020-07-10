@@ -298,7 +298,7 @@ module.exports = function (RED) {
                             method: 'POST',
                             json: false,
                             body: myjson
-                        }, function (error, response, body) {});
+                        }, function (error, response, body) { });
                     }, function (err) {
                         node.status({
                             fill: "yellow",
@@ -323,7 +323,7 @@ module.exports = function (RED) {
                             method: 'POST',
                             json: false,
                             body: myjson
-                        }, function (error, response, body) {});
+                        }, function (error, response, body) { });
 
                     }, function (err) {
                         node.status({
@@ -375,7 +375,7 @@ module.exports = function (RED) {
                             return bmp;
                         } else {
                             try {
-                                var res = syncRequest('GET', 'https://api.bastelbunker.de/PixelItService/GetBMPByID/' + input, {
+                                var res = syncRequest('GET', 'https://pixelit.bastelbunker.de/API/GetBMPByID/' + input, {
                                     headers: {
                                         'User-Agent': 'Node_Red_Core'
                                     },
