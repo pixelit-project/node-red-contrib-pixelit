@@ -8,3 +8,10 @@
 
 ## Example
 ![Example](https://www.bastelbunker.de/Pixelit_nodered.png)
+
+## Changelog
+
+### __WORK IN PROGRESS__
+* (o0shojo0o) code refactor
+* (o0shojo0o) removed old references and adjusted the code 
+* (o0shojo0o) request replaced by axios
