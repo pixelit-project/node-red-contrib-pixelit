@@ -1,0 +1,61 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Sound', {
+        category: 'Pixel It',
+        color: '#47c0e8',
+        defaults: {
+            name: {
+                value: "Sound"
+            },
+            inControl: {
+                value: "play"
+            },
+            inVolume: {
+                value: "15"
+            },
+            inFolder: {
+                value: "0"
+            },
+            inFile: {
+                value: "1"
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "spaceInvader.png",
+        label: function () {
+            return this.name || "Sound";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="Sound">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inControl"><i class="icon-tag"></i> Control</label>
+        <select id="node-input-inControl">
+            <option value="play">Play</option>
+            <option value="pause">Pause</option>
+            <option value="next">Next</option>
+            <option value="previous">Previous</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-inVolume"><i class="icon-tag"></i> Volume</label>
+        <input type="number" min="0" max="30" id="node-input-inVolume" placeholder="Volume">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inFolder"><i class="icon-tag"></i> Folder</label>
+        <input type="number" id="node-input-inFolder" placeholder="Folder">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inFile"><i class="icon-tag"></i> File</label>
+        <input type="number" id="node-input-inFile" placeholder="File">
+    </div>      
+</script>
+
+<script type="text/x-red" data-help-name="Sound">
+    <p>For more information please visit the <a href="https://www.bastelbunker.de/pixel-it/">Blog</a>, <a href="https://docs.bastelbunker.de/pixelit/tools.html#sound">Documentation</a> or <a href="https://forum.bastelbunker.de/t/pixel-it">Forum</a></p>    
+</script>

@@ -1,0 +1,76 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Clock', {
+        category: 'Pixel It',
+        color: '#47c0e8',
+        defaults: {
+            name: {
+                value: "Clock"
+            },
+            inswitchAktiv: {
+                value: "true"
+            },
+            inswitchSec: {
+                value: "5"
+            },
+            inwithSeconds: {
+                value: "false"
+            },
+            incolorR: {
+                value: "255"
+            },
+            incolorG: {
+                value: "255"
+            },
+            incolorB: {
+                value: "255"
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "spaceInvader.png",
+        label: function () {
+            return this.name || "Clock";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="Clock">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inswitchAktiv"><i class="icon-tag"></i> Date Time Switch</label>
+        <select id="node-input-inswitchAktiv">
+            <option value="true">On</option>
+            <option value="false">Off</option>
+          </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-inswitchSec"><i class="icon-tag"></i> Switch Sec</label>
+        <input type="text" id="node-input-inswitchSec">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inwithSeconds"><i class="icon-tag"></i> With Seconds</label>
+        <select id="node-input-inwithSeconds">
+            <option value="true">On</option>
+            <option value="false">Off</option>
+          </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-incolorR"><i class="icon-tag"></i> Color R</label>
+        <input type="text" id="node-input-incolorR">
+    </div>
+    <div class="form-row">
+        <label for="node-input-incolorG"><i class="icon-tag"></i> Color G</label>
+        <input type="text" id="node-input-incolorG">
+    </div>
+    <div class="form-row">
+        <label for="node-input-incolorB"><i class="icon-tag"></i> Color B</label>
+        <input type="text" id="node-input-incolorB">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="Clock">
+    <p>For more information please visit the <a href="https://www.bastelbunker.de/pixel-it/">Blog</a>, <a href="https://docs.bastelbunker.de/pixelit/tools.html#clock">Documentation</a> or <a href="https://forum.bastelbunker.de/t/pixel-it">Forum</a></p>    
+</script>

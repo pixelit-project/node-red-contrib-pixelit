@@ -1,11 +1,9 @@
 {
     "name": "node-red-contrib-pixelit",
-    "version": "0.3.2",
+    "version": "0.3.3-beta.0",
     "description": "Pixel it Project",
     "dependencies": {
-        "request": "^2.88.0",
-        "sync-request": "^6.0.0",
-        "bluebird": "^3.3.4"
+        "axios": "^0.21.1"
     },
     "engines": {
         "node": ">=5.0.0"
@@ -23,10 +21,22 @@
     ],
     "node-red": {
         "nodes": {
-            "pixelit": "pixelit/pixelit.js"
+            "alertScreen": "pixelit/alertScreen.js",
+            "bitmap": "pixelit/bitmap.js",
+            "bitmapAnimation": "pixelit/bitmapAnimation.js",
+            "clock": "pixelit/clock.js",
+            "core": "pixelit/core.js",
+            "matrixConfig": "pixelit/matrixConfig.js",
+            "matrixControl": "pixelit/matrixControl.js",
+            "playlistUpdate": "pixelit/playlistUpdate.js",
+            "screenDatatUpdate": "pixelit/screenDatatUpdate.js",
+            "screenInit": "pixelit/screenInit.js",
+            "sound": "pixelit/sound.js",
+            "switchAnimation": "pixelit/switchAnimation.js",
+            "text": "pixelit/text.js"
         }
     },
     "author": {
-        "name": "Dennis Hinzpeter"
+        "name": "Dennis Rathjen"
     }
 }

@@ -1,0 +1,43 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Core', {
+        category: 'Pixel It',
+        color: '#9876d3',
+        defaults: {
+            name: {
+                value: "Core"
+            },
+            ip: {
+                value: ""
+            },
+            masterTopic: {
+                value: ""
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "spaceInvader.png",
+        label: function () {
+            return this.name || "Core";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="Core">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>      
+    <div class="form-row">        
+        <label for="node-input-ip"><i class="icon-tag"></i> IP-Address</label>
+        <input type="text" id="node-input-ip" placeholder="IP-Address (Optional)">        
+    </div>      
+    <div class="form-row">  
+        <label for="node-input-masterTopic"><i class="icon-tag"></i> Master-Topic</label>       
+        <input type="text" id="node-input-masterTopic" placeholder="Master-Topic (Optional)">
+    </div>  
+</script>
+
+<script type="text/x-red" data-help-name="Core">
+    <p>The central node that takes care of everything from Node-Red to Pixel It and processes it.<p>
+    <p>For more information please visit the <a href="https://www.bastelbunker.de/pixel-it/">Blog</a>, <a href="https://docs.bastelbunker.de/pixelit/tools.html#core">Documentation</a> or <a href="https://forum.bastelbunker.de/t/pixel-it">Forum</a></p>    
+</script>

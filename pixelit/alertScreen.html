@@ -1,0 +1,28 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Alert Screen', {
+        category: 'Pixel It',
+        color: '#1abc9c',
+        defaults: {
+            name: {
+                value: "Alert Screen"
+            },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "spaceInvader.png",
+        label: function () {
+            return this.name || "Alert Screen";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="Alert Screen">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="Alert Screen">
+    <p>For more information please visit the <a href="https://www.bastelbunker.de/pixel-it/">Blog</a>, <a href="https://docs.bastelbunker.de/pixelit/tools.html#alert-screen">Documentation</a> or <a href="https://forum.bastelbunker.de/t/pixel-it">Forum</a></p>    
+</script>

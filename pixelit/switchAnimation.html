@@ -1,0 +1,48 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Switch Animation', {
+        category: 'Pixel It',
+        color: '#47c0e8',
+        defaults: {
+            name: {
+                value: "Switch Animation"
+            },
+            aktiv: {
+                value: "false"
+            },
+            animation: {
+                value: "fade"
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "spaceInvader.png",
+        label: function () {
+            return this.name || "Switch Animation";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="Switch Animation">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-aktiv"><i class="icon-tag"></i> Animation aktiv</label>
+        <select id="node-input-aktiv">
+            <option value="true">On</option>
+            <option value="false">Off</option>
+          </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-animation"><i class="icon-tag"></i> Animation style</label>
+        <select id="node-input-animation">
+            <option value="fade">Fade</option>
+            <option value="coloredBarWipe">Colored Bar Wipe</option>
+          </select>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="Switch Animation">
+    <p>For more information please visit the <a href="https://www.bastelbunker.de/pixel-it/">Blog</a>, <a href="https://docs.bastelbunker.de/pixelit/tools.html#switch-animation">Documentation</a> or <a href="https://forum.bastelbunker.de/t/pixel-it">Forum</a></p>    
+</script>

@@ -1,0 +1,59 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Bitmap Animation', {
+        category: 'Pixel It',
+        color: '#47c0e8',
+        defaults: {
+            name: {
+                value: "Bitmap Animation"
+            },
+            indata: {
+                value: ""
+            },
+            inanimationDelay: {
+                value: "100"
+            },
+            inrubberbanding: {
+                value: "false"
+            },
+            inlimitLoops: {
+                value: "0"
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "spaceInvader.png",
+        label: function () {
+            return this.name || "Bitmap Animation";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="Bitmap Animation">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-indata"><i class="icon-tag"></i> Data/ID</label>
+        <input type="text" id="node-input-indata">
+    </div>  
+    <div class="form-row">
+        <label for="node-input-inanimationDelay"><i class="icon-tag"></i> Animation Delay</label>
+        <input type="text" id="node-input-inanimationDelay">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inrubberbanding"><i class="icon-tag"></i> Rubberbanding</label>
+        <select id="node-input-inrubberbanding">
+            <option value="true">On</option>
+            <option value="false">Off</option>
+          </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-inlimitLoops"><i class="icon-tag"></i> Loops Limit</label>
+        <input type="text" id="node-input-inlimitLoops">
+    </div>   
+</script>
+
+<script type="text/x-red" data-help-name="Bitmap Animation">
+    <p>For more information please visit the <a href="https://www.bastelbunker.de/pixel-it/">Blog</a>, <a href="https://docs.bastelbunker.de/pixelit/tools.html#bitmap-animation">Documentation</a> or <a href="https://forum.bastelbunker.de/t/pixel-it">Forum</a></p>    
+</script>

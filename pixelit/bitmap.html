@@ -1,0 +1,63 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Bitmap', {
+        category: 'Pixel It',
+        color: '#47c0e8',
+        defaults: {
+            name: {
+                value: "Bitmap"
+            },
+            indata: {
+                value: ""
+            },
+            inposX: {
+                value: "0"
+            },
+            inposY: {
+                value: "0"
+            },
+            inwidth: {
+                value: "8"
+            },
+            inheight: {
+                value: "8"
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "spaceInvader.png",
+        label: function () {
+            return this.name || "Bitmap";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="Bitmap">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-indata"><i class="icon-tag"></i> Data/ID</label>
+        <input type="text" id="node-input-indata">
+    </div>  
+    <div class="form-row">
+        <label for="node-input-inposX"><i class="icon-tag"></i> Position X</label>
+        <input type="text" id="node-input-inposX">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inposY"><i class="icon-tag"></i> Position Y</label>
+        <input type="text" id="node-input-inposY">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inwidth"><i class="icon-tag"></i> Width</label>
+        <input type="text" id="node-input-inwidth">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inheight"><i class="icon-tag"></i> Height</label>
+        <input type="text" id="node-input-inheight">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="Bitmap">
+    <p>For more information please visit the <a href="https://www.bastelbunker.de/pixel-it/">Blog</a>, <a href="https://docs.bastelbunker.de/pixelit/tools.html#bitmap">Documentation</a> or <a href="https://forum.bastelbunker.de/t/pixel-it">Forum</a></p>    
+</script>
