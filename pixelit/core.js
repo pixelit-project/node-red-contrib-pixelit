@@ -342,7 +342,7 @@ module.exports = (red) => {
             }
 
             async function sendToPixelItConfig(myjson) {
-                var result = {
+                const result = {
                     topic: mqttMasterTopic + '/setConfig',
                     payload: myjson
                 };
@@ -355,21 +355,21 @@ module.exports = (red) => {
                                 'User-Agent': 'Node_Red_Core',
                                 'Content-type': 'application/json; charset=utf-8'
                             },
-                            //timeout: 1000
+                            timeout: 1000
                         });
                     } 
                     catch (error) {
                         node.status({
                             fill: "yellow",
                             shape: "dot",
-                            text: "Cannot send.."
+                            text: "Cannot reach the Pixel It via http API.."
                         });
                     }
                 }
             }
 
-            function sendToPixelItScreen(myjson) {
-                var result = {
+            async function sendToPixelItScreen(myjson) {
+                const result = {
                     topic: mqttMasterTopic + '/setScreen',
                     payload: myjson
                 };
@@ -377,38 +377,21 @@ module.exports = (red) => {
 
                 if (sendOverHTTPAktiv) {
                     try {
-                        axios.post(`http://${config.ip}/api/screen`, myjson, {
+                        await axios.post(`http://${config.ip}/api/screen`, myjson, {
                             headers: {
                                 'User-Agent': 'Node_Red_Core',
                                 'Content-type': 'application/json; charset=utf-8'
                             },
-                            //timeout: 1000
+                            timeout: 1000
                         });
                     } 
                     catch (error) {
                         node.status({
                             fill: "yellow",
                             shape: "dot",
-                            text: "Cannot send.."
+                            text: "Cannot reach the Pixel It via http API.."
                         });
                     }
-                    /*
-                    checkConnection(config.ip).then(function () {
-                        request({
-                            uri: 'http://' + config.ip + '/api/screen',
-                            method: 'POST',
-                            json: false,
-                            body: myjson
-                        }, function (error, response, body) { });
-
-                    }, function (err) {
-                        node.status({
-                            fill: "yellow",
-                            shape: "dot",
-                            text: "Cannot send.."
-                        });
-                    });
-                    */
                 }
             }           
 
@@ -433,19 +416,18 @@ module.exports = (red) => {
                                 'User-Agent': 'Node_Red_Core',
                                 'Content-type': 'application/json; charset=utf-8'
                             },
-                            //timeout: 1000
+                            timeout: 1000
                         });
                         webResult = res.data;
                     } 
-                    catch (error) {
+                    catch (error) {                        
                         webResult = undefined;
                     }
 
                     if (webResult && webResult.id && webResult.id != 0) {
                         webBmp = webResult.rgB565Array;
                         context.set(`bmpCache_${input}`, webBmp);
-                    }                    
-                    
+                    }
                 }
                 return webBmp;
             }
