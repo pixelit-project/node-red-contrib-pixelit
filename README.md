@@ -11,7 +11,7 @@
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 0.3.3 (2021-03-20)
 * (o0shojo0o) code refactor
 * (o0shojo0o) removed old references and adjusted the code 
 * (o0shojo0o) request replaced by axios
