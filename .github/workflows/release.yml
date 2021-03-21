@@ -16,8 +16,7 @@ on:
 jobs:
   # Deploys the final package to NPM (only if commit includes a version tag !
   deploy:
-    needs: [adapter-tests]
-
+  
     # Trigger this step only when a commit on master is tagged with a version number
     if: |
       github.event_name == 'push' &&
