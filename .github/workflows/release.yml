@@ -9,12 +9,6 @@ on:
 jobs:
   # Deploys the final package to NPM (only if commit includes a version tag !
   deploy:
-  
-    # Trigger this step only when a commit on master is tagged with a version number
-    if: |
-      github.event_name == 'push' &&
-      github.event.base_ref == 'refs/heads/master' &&
-      startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     strategy:
       matrix:
