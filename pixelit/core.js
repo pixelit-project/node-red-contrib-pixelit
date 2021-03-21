@@ -29,28 +29,7 @@ module.exports = (red) => {
             // This topic sent by all providers to update the data in the context
             if (msg.topic === 'screen_data_update') {
                 if (msg.screenName && msg.duration) {
-                    // Key whitelist
-                    const keyWhiteList = [
-                        'duration',
-                        'screenName',
-                        'sleepMode',
-                        'brightness',
-                        'switchAnimation',
-                        'clock',
-                        'sound',
-                        'bitmap',
-                        'bitmapAnimation',
-                        'bar',
-                        'bars',
-                        'text',
-                        'show'
-                    ];
-                    // Clean Obj
-                    for (const key in msg) {
-                        if (!keyWhiteList.includes(key)){
-                            delete msg[key];
-                        } 
-                    }
+                    tools.cleanDisplayMSG(msg);
                     context.set(msg.screenName, msg);
                     node.status({
                         fill: 'blue',
@@ -167,13 +146,15 @@ module.exports = (red) => {
                     status = `Displaying alert [${msg.screenName}] now!`;
                 }
 
+                tools.cleanDisplayMSG(msg);
+
                 context.set('timeout', setTimeout(getNextScreen, (msg.duration * 1000)));
                 node.status({
                     fill: 'yellow',
                     shape: 'ring',
                     text: status
                 });
-                sendToPixelItScreen(createScreenJson(msg));
+                sendToPixelItScreen(await createScreenJson(msg));
             }
 
             async function getNextScreen() {

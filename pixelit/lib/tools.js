@@ -1,6 +1,31 @@
 //@ts-check
 'use strict';
 
+function cleanDisplayMSG(msg) {
+    // Key whitelist
+    const keyWhiteList = [
+        'duration',
+        'screenName',
+        'sleepMode',
+        'brightness',
+        'switchAnimation',
+        'clock',
+        'sound',
+        'bitmap',
+        'bitmapAnimation',
+        'bar',
+        'bars',
+        'text',
+        'show'
+    ];
+    // Clean Obj
+    for (const key in msg) {
+        if (!keyWhiteList.includes(key)){
+            delete msg[key];
+        } 
+    }
+}
+
 function getValue(red, input, msg) {
     var output;
     if (input) {
@@ -43,5 +68,6 @@ module.exports = {
     cleanMsgVal,
     cleanScreenName,
     isBoolean,
-    booleanConvert
+    booleanConvert,
+    cleanDisplayMSG
 }
