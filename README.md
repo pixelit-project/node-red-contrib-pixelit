@@ -11,6 +11,9 @@
 
 ## Changelog
 
+### 0.3.4 (2021-03-21)
+* (o0shojo0o) bugfix 'Alert Screen'
+
 ### 0.3.3 (2021-03-20)
 * (o0shojo0o) code refactor
 * (o0shojo0o) removed old references and adjusted the code 
