@@ -15,4 +15,4 @@
 * (o0shojo0o) code refactor
 * (o0shojo0o) removed old references and adjusted the code 
 * (o0shojo0o) request replaced by axios
-* (o0shojo0o) fix axios exceptions
+* (o0shojo0o) fix axios exceptions  
