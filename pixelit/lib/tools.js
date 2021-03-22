@@ -55,7 +55,12 @@ function isBoolean(val) {
     return val === false || val === true;
 }
 
-function booleanConvert(val) {
+
+/**
+ * @param {string | boolean} val 
+ * @description convert to Boolean
+ */
+function booleanConvert(val) {    
     if (!this.isBoolean(val)){
         val = val  == 'true';
     }

@@ -12,8 +12,8 @@ module.exports = (red) => {
         
         this.on('input', async (msg) => {
 
-            let sleepModeAktiv = context.get('sleepModeAktiv') || false;
-            let sendOverHTTPAktiv = true;
+            let sleepModeActive = context.get('sleepModeActive') || false;
+            let sendOverHTTPActive = true;
             let mqttMasterTopic = tools.getValue(red, config.masterTopic, msg) || '';
 
             // Clean Master Topic
@@ -23,7 +23,7 @@ module.exports = (red) => {
 
             // Check is IP Config?!
             if (!config.ip || config.ip === '') {
-                sendOverHTTPAktiv = false;
+                sendOverHTTPActive = false;
             }
 
             // This topic sent by all providers to update the data in the context
@@ -47,11 +47,11 @@ module.exports = (red) => {
             }
 
             // Check is SleepMode Aktiv?! (Ab hier ist dann schluß! :-) )
-            if (sleepModeAktiv == true && msg.sleepMode == null) {
+            if (sleepModeActive == true && msg.sleepMode == undefined) {
                 node.status({
                     fill: 'yellow',
                     shape: 'ring',
-                    text: 'Sleep Mode Aktiv!'
+                    text: 'Sleep Mode Active!'
                 });
                 return;
             }
@@ -65,19 +65,24 @@ module.exports = (red) => {
                 });
 
                 // SleepMode Steuerung 
-                if (msg.sleepMode && msg.sleepMode == true) {
+                if (msg.sleepMode != undefined && tools.booleanConvert(msg.sleepMode) == true) {
                     clearTimeout(context.get('timeout'));
-                    sleepModeAktiv = true;
-                    context.set('sleepModeAktiv', sleepModeAktiv);
+                    sleepModeActive = true;
+                    context.set('sleepModeActive', sleepModeActive);
+                    node.status({
+                        fill: 'yellow',
+                        shape: 'ring',
+                        text: 'Sleep Mode Active!'
+                    });
                     sendToPixelItScreen(createScreenJson(msg));
                 } 
-                else if (msg.sleepMode && msg.sleepMode == false) {
-                    sleepModeAktiv = false;
-                    context.set('sleepModeAktiv', sleepModeAktiv);
+                else if (msg.sleepMode != undefined && tools.booleanConvert(msg.sleepMode) == false) {
+                    sleepModeActive = false;
+                    context.set('sleepModeActive', sleepModeActive);
                     sendToPixelItScreen(createScreenJson(msg));
-                    await getNextScreen();
+                    getNextScreen();
                 } 
-                else if (sleepModeAktiv == false) {
+                else if (sleepModeActive == false) {
                     sendToPixelItScreen(createScreenJson(msg));
                 }
             }
@@ -329,7 +334,7 @@ module.exports = (red) => {
                 };
                 node.send(result);
 
-                if (sendOverHTTPAktiv) {
+                if (sendOverHTTPActive) {
                     try {
                         await axios.post(`http://${config.ip}/api/config`, myjson, {
                             headers: {
@@ -356,7 +361,7 @@ module.exports = (red) => {
                 };
                 node.send(result);
 
-                if (sendOverHTTPAktiv) {
+                if (sendOverHTTPActive) {
                     try {
                         await axios.post(`http://${config.ip}/api/screen`, myjson, {
                             headers: {
