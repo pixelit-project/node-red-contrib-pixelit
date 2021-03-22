@@ -11,6 +11,9 @@
 
 ## Changelog
 
+### 0.3.5 (2021-03-22)
+* (o0shojo0o) bugfix 'SleepMode'
+
 ### 0.3.4 (2021-03-21)
 * (o0shojo0o) bugfix 'Alert Screen'
 
