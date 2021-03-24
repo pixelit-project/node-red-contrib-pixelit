@@ -11,6 +11,9 @@
 
 ## Changelog
 
+### 0.3.6 (2021-03-22)
+* (o0shojo0o) bugfix 'Text.Scroll'
+
 ### 0.3.5 (2021-03-22)
 * (o0shojo0o) bugfix 'SleepMode'
 
