@@ -74,16 +74,16 @@ module.exports = (red) => {
                         shape: 'ring',
                         text: 'Sleep Mode Active!'
                     });
-                    sendToPixelItScreen(createScreenJson(msg));
+                    sendToPixelItScreen(await createScreenJson(msg));
                 } 
                 else if (msg.sleepMode != undefined && tools.booleanConvert(msg.sleepMode) == false) {
                     sleepModeActive = false;
                     context.set('sleepModeActive', sleepModeActive);
-                    sendToPixelItScreen(createScreenJson(msg));
+                    sendToPixelItScreen(await createScreenJson(msg));
                     getNextScreen();
                 } 
                 else if (sleepModeActive == false) {
-                    sendToPixelItScreen(createScreenJson(msg));
+                    sendToPixelItScreen(await createScreenJson(msg));
                 }
             }
 
