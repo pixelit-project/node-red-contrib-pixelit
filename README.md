@@ -11,6 +11,10 @@
 
 ## Changelog
 
+### 0.3.7 (2021-03-27)
+* (o0shojo0o) bugfix SleepMode brightness
+* (o0shojo0o) bugfix Brightness
+
 ### 0.3.6 (2021-03-24)
 * (o0shojo0o) bugfix 'Text.Scroll'
 
