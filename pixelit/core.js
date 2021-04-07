@@ -274,7 +274,12 @@ module.exports = (red) => {
                 // Text Overrides
                 if (jsonObj.text) {                    
                     if (jsonObj.text.scrollText != undefined) {
-                        jsonObj.text.scrollText = jsonObj.text.scrollText; 
+                        if (jsonObj.text.scrollText != 'auto'){
+                            jsonObj.text.scrollText = tools.booleanConvert(jsonObj.text.scrollText);
+                        } 
+                        else {
+                            jsonObj.text.scrollText = jsonObj.text.scrollText; 
+                        }                        
                     }
 
                     if (jsonObj.text.scrollTextDelay) {
