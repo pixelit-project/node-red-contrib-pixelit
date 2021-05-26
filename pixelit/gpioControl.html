@@ -1,0 +1,52 @@
+<script type="text/javascript">
+    RED.nodes.registerType('GPIO Control', {
+        category: 'Pixel It',
+        color: '#47c0e8',
+        defaults: {
+            name: {
+                value: "GPIO Control"
+            },
+            gpio: {
+                value: "14"
+            },
+            set: {
+                value: "true"
+            },
+            duration: {
+                value: "1000"
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "spaceInvader.png",
+        label: function () {
+            return this.name || "GPIO Control";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="GPIO Control">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-gpio"><i class="icon-tag"></i> GPIO</label>
+        <input type="text" id="node-input-gpio" placeholder="14">
+    </div>
+    <div class="form-row">
+        <label for="node-input-set"><i class="icon-tag"></i>Value</label>
+        <select id="node-input-set">
+            <option value="true">On</option>
+            <option value="false">Off</option>
+          </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-duration"><i class="icon-tag"></i> duration</label>
+        <input type="text" id="node-input-duration" placeholder="1000">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="GPIO Control">
+    <p>For more information please visit the <a href="https://www.bastelbunker.de/pixel-it/">Blog</a>, <a href="https://docs.bastelbunker.de/pixelit/tools.html#gpio-control">Documentation</a> or <a href="https://forum.bastelbunker.de/t/pixel-it">Forum</a></p>    
+</script>

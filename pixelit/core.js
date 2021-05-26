@@ -151,7 +151,7 @@ module.exports = (red) => {
                     status = `Displaying alert [${msg.screenName}] now!`;
                 }
 
-                tools.cleanDisplayMSG(msg);
+                tools.cleanDisplayMSG(msg);                
 
                 context.set('timeout', setTimeout(getNextScreen, (msg.duration * 1000)));
                 node.status({
@@ -159,6 +159,7 @@ module.exports = (red) => {
                     shape: 'ring',
                     text: status
                 });
+                
                 sendToPixelItScreen(await createScreenJson(msg));
             }
 
@@ -319,7 +320,15 @@ module.exports = (red) => {
                     jsonObj.bar.color.r = Number(jsonObj.bar.color.r);
                     jsonObj.bar.color.g = Number(jsonObj.bar.color.g);
                     jsonObj.bar.color.b = Number(jsonObj.bar.color.b);    
-                }             
+                }     
+                // Set GPIO Overrides
+                if (jsonObj.setGpio) {
+                    jsonObj.setGpio.gpio = Number(jsonObj.setGpio.gpio);
+                    jsonObj.setGpio.set = tools.booleanConvert(jsonObj.setGpio.set);
+                    if (jsonObj.setGpio.duration){
+                        jsonObj.setGpio.duration = Number(jsonObj.setGpio.duration);
+                    }
+                }         
 
                 return JSON.stringify(jsonObj);
             }
@@ -359,11 +368,12 @@ module.exports = (red) => {
                 }
             }
 
-            async function sendToPixelItScreen(myjson) {
+            async function sendToPixelItScreen(myjson) {   
                 const result = {
                     topic: mqttMasterTopic + '/setScreen',
                     payload: myjson
                 };
+
                 node.send(result);
 
                 if (sendOverHTTPActive) {

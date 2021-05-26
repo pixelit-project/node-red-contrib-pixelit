@@ -16,7 +16,8 @@ function cleanDisplayMSG(msg) {
         'bar',
         'bars',
         'text',
-        'show'
+        'show',
+        'setGpio'
     ];
     // Clean Obj
     for (const key in msg) {
