@@ -11,6 +11,9 @@
 
 ## Changelog
 
+### 0.3.9 (2021-04-07)
+* (o0shojo0o) add GPIO Control
+
 ### 0.3.8 (2021-04-07)
 * (o0shojo0o) bugfix 'Text.Scroll' -> on
 
