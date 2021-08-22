@@ -35,3 +35,12 @@
 * (o0shojo0o) removed old references and adjusted the code 
 * (o0shojo0o) request replaced by axios
 * (o0shojo0o) fix axios exceptions  
+
+### 0.3.2 (2020-06-10)
+* (o0shojo0o) New API address
+
+### 0.3.1 (2019-12-27)
+* (o0shojo0o) Bugfix undefined exception
+
+### 0.3.0 (2019-12-26)
+* (o0shojo0o) Added support für new sound feature of Pixel It v. 1912182240
