@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-pixelit",
-    "version": "0.3.9",
+    "version": "0.3.10",
     "description": "Pixel it Project",
     "dependencies": {
         "axios": "^0.21.1"
