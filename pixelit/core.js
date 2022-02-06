@@ -228,6 +228,15 @@ module.exports = (red) => {
                 // SwitchAnimation Overrides
                 if (jsonObj.switchAnimation != undefined) {
                     jsonObj.switchAnimation.aktiv = tools.booleanConvert(jsonObj.switchAnimation.aktiv);
+                    if (jsonObj.switchAnimation.data) {
+                        jsonObj.switchAnimation.data = JSON.parse(await getBitMap(jsonObj.switchAnimation.data));
+                        jsonObj.switchAnimation.width = Number(jsonObj.switchAnimation.width);
+                    }
+                    if (jsonObj.switchAnimation.color) {
+                        jsonObj.switchAnimation.color.r = Number(jsonObj.switchAnimation.color.r);
+                        jsonObj.switchAnimation.color.g = Number(jsonObj.switchAnimation.color.g);
+                        jsonObj.switchAnimation.color.b = Number(jsonObj.switchAnimation.color.b);
+                    }
                 }
                 // Bitmap Overrides
                 if (jsonObj.bitmap) {

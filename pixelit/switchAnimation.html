@@ -10,7 +10,25 @@
                 value: "false"
             },
             animation: {
-                value: "fade"
+                value: "random"
+            },
+            indata: {
+                value: ""
+            },
+            inwidth: {
+                value: "8"
+            },
+            incolorHex: {
+                value: null
+            },
+            incolorR: {
+                value: "255"
+            },
+            incolorG: {
+                value: "255"
+            },
+            incolorB: {
+                value: "255"
             }
         },
         inputs: 1,
@@ -39,7 +57,40 @@
         <select id="node-input-animation">
             <option value="fade">Fade</option>
             <option value="coloredBarWipe">Colored Bar Wipe</option>
+            <option value="zigzagWipe">Zig Zag Wipe</option>
+            <option value="bitmapWipe">Bitmap Wipe(no animated BMPs!)</option>
+            <option value="random">Random (without 'Bitmap Wipe')</option>
           </select>
+    </div>
+    <div class="form-row">
+        <b>Bitmap for Bitmap Wipe animation (no animated BMPs!)</b>
+    </div>
+    <div class="form-row">
+        <label for="node-input-indata"><i class="icon-tag"></i> Data/ID</label>
+        <input type="text" id="node-input-indata">
+    </div>  
+    <div class="form-row">
+        <label for="node-input-inwidth"><i class="icon-tag"></i> Width</label>
+        <input type="text" id="node-input-inwidth">
+    </div>
+    <div class="form-row">
+        <b>Color for Colored Bar Wipe animation</b>
+    </div>
+    <div class="form-row">
+        <label for="node-input-incolorHex"><i class="icon-tag"></i> Hex Color</label>
+        <input type="text" id="node-input-incolorHex">
+    </div>
+    <div class="form-row">
+        <label for="node-input-incolorR"><i class="icon-tag"></i> Color R</label>
+        <input type="text" id="node-input-incolorR">
+    </div>
+    <div class="form-row">
+        <label for="node-input-incolorG"><i class="icon-tag"></i> Color G</label>
+        <input type="text" id="node-input-incolorG">
+    </div>
+    <div class="form-row">
+        <label for="node-input-incolorB"><i class="icon-tag"></i> Color B</label>
+        <input type="text" id="node-input-incolorB">
     </div>
 </script>
 

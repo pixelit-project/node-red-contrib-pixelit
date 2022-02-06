@@ -15,6 +15,7 @@ module.exports = (red) => {
             msg.text.position = {};
             msg.text.position.x = Number(tools.getValue(red, config.inposX, msg));
             msg.text.position.y = Number(tools.getValue(red, config.inposY, msg));
+            msg.text.hexColor = tools.getValue(red, config.incolorHex, msg);
             msg.text.color = {};
             msg.text.color.r = Number(tools.getValue(red, config.incolorR, msg));
             msg.text.color.g = Number(tools.getValue(red, config.incolorG, msg));

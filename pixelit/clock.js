@@ -11,6 +11,7 @@ module.exports = (red) => {
             msg.clock.switchAktiv = config.inswitchAktiv;
             msg.clock.switchSec = tools.getValue(red, config.inswitchSec);
             msg.clock.withSeconds = config.inwithSeconds;
+            msg.clock.hexColor = tools.getValue(red, config.incolorHex, msg);
             msg.clock.color = {};
             msg.clock.color.r = tools.getValue(red, config.incolorR, msg);
             msg.clock.color.g = tools.getValue(red, config.incolorG, msg);
