@@ -1,7 +1,7 @@
 {
     "name": "node-red-contrib-pixelit",
     "version": "0.3.13",
-    "description": "Pixel it Project",
+    "description": "PixelIt Project",
     "dependencies": {
         "axios": "^0.27.2"
     },
@@ -11,7 +11,7 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/o0shojo0o/node-red-contrib-pixelit.git"
+        "url": "https://github.com/pixelit-project/node-red-contrib-pixelit.git"
     },
     "keywords": [
         "node-red",
