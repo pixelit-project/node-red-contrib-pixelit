@@ -2,6 +2,7 @@
 "use strict";
 const tools = require("./lib/tools");
 const axios = require("axios").default;
+const errorImage = '[64512,0,0,0,0,0,0,64512,0,64512,0,0,0,0,64512,0,0,0,64512,0,0,64512,0,0,0,0,0,64512,64512,0,0,0,0,0,0,64512,64512,0,0,0,0,0,64512,0,0,64512,0,0,0,64512,0,0,0,0,64512,0,64512,0,0,0,0,0,0,64512]';
 
 module.exports = (red) => {
     // Core
@@ -240,7 +241,11 @@ module.exports = (red) => {
                 }
                 // Bitmap Overrides
                 if (jsonObj.bitmap) {
-                    jsonObj.bitmap.data = JSON.parse(await getBitMap(jsonObj.bitmap.data));
+                    try {
+                        jsonObj.bitmap.data = JSON.parse(await getBitMap(jsonObj.bitmap.data));
+                    } catch (error) {
+                        jsonObj.bitmap.data = JSON.parse(errorImage);;
+                    }
                     if (jsonObj.bitmap.position) {
                         jsonObj.bitmap.position.x = Number(jsonObj.bitmap.position.x);
                         jsonObj.bitmap.position.y = Number(jsonObj.bitmap.position.y);
@@ -256,8 +261,12 @@ module.exports = (red) => {
                         jsonObj.bitmapAnimation.limitLoops = 0;
                     }
                     jsonObj.bitmapAnimation.limitLoops = Number(jsonObj.bitmapAnimation.limitLoops);
-                    jsonObj.bitmapAnimation.data = JSON.parse(`[${await getBitMap(jsonObj.bitmapAnimation.data)}]`);
-                    //jsonObj.bitmapAnimation.rubberbanding = jsonObj.bitmapAnimation.rubberbanding;
+                    try {
+                        jsonObj.bitmapAnimation.data = JSON.parse(`[${await getBitMap(jsonObj.bitmapAnimation.data)}]`);
+                    } catch (error) {
+                        jsonObj.bitmapAnimation.data = JSON.parse(`[${errorImage}]`);
+                    }
+
                     jsonObj.bitmapAnimation.animationDelay = Number(jsonObj.bitmapAnimation.animationDelay);
                 }
                 // Sound Overrides
@@ -401,7 +410,7 @@ module.exports = (red) => {
             }
 
             async function getBitMap(input) {
-                let webBmp = "[64512,0,0,0,0,0,0,64512,0,64512,0,0,0,0,64512,0,0,0,64512,0,0,64512,0,0,0,0,0,64512,64512,0,0,0,0,0,0,64512,64512,0,0,0,0,0,64512,0,0,64512,0,0,0,64512,0,0,0,0,64512,0,64512,0,0,0,0,0,0,64512]";
+                let webBmp = errorImage;
                 let webResult;
 
                 if (input) {

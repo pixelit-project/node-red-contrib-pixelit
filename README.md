@@ -2,15 +2,19 @@
 
 [![NPM version](http://img.shields.io/npm/v/node-red-contrib-pixelit.svg)](https://www.npmjs.com/package/node-red-contrib-pixelit)
 [![Downloads](https://img.shields.io/npm/dm/node-red-contrib-pixelit.svg)](https://www.npmjs.com/package/node-red-contrib-pixelit)
-[![Known Vulnerabilities](https://snyk.io/test/github/o0shojo0o/node-red-contrib-pixelit/badge.svg)](https://snyk.io/test/github/o0shojo0o/node-red-contrib-pixelit)
+[![Known Vulnerabilities](https://snyk.io/test/github/o0shojo0o/node-red-contrib-pixelit/badge.svg)](https://snyk.io/test/github/ixelit-project/node-red-contrib-pixelit)
 
-[Node-RED](https://nodered.org/) nodes to control the [PixelIt](https://www.bastelbunker.de/pixel-it/) easily and comfortably.
+[Node-RED](https://nodered.org/) nodes to control the [PixelIt](https://github.com/pixelit-project/PixelIt) easily and comfortably.
 
 ## Example
 
 ![Example](https://www.bastelbunker.de/Pixelit_nodered.png)
 
 ## Changelog
+
+### 0.3.14 (2022-08-16)
+
+-   (o0shojo0o) better JSON error handling
 
 ### 0.3.13 (2022-08-13)
 
