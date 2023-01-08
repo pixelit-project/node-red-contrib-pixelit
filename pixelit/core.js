@@ -434,6 +434,12 @@ module.exports = (red) => {
                         });
                         webResult = res.data;
                     } catch (error) {
+						node.status({
+                            fill: "red",
+                            shape: "dot",
+                            text: `Failed to download icon ${input}. Check Node-RED log.`,
+                        });
+                        console.log(`PixelIt Core: Failed to download icon getBitMap(${input})!`, error.message);
                         webResult = undefined;
                     }
 
