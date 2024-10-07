@@ -12,6 +12,11 @@
 
 ## Changelog
 
+### 0.4.0 (2024-10-07)
+
+-   (o0shojo0o) added PixelIt UUID to Core-Node (is necessary in the future to use the API)
+-   (o0shojo0o) update dependencies
+
 ### 0.3.14 (2022-08-16)
 
 -   (o0shojo0o) better JSON error handling

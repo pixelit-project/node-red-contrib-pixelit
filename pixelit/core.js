@@ -1,7 +1,7 @@
 //@ts-check
 "use strict";
 const tools = require("./lib/tools");
-const axios = require("axios").default;
+const axios = require("axios");
 const errorImage = '[64512,0,0,0,0,0,0,64512,0,64512,0,0,0,0,64512,0,0,0,64512,0,0,64512,0,0,0,0,0,64512,64512,0,0,0,0,0,0,64512,64512,0,0,0,0,0,64512,0,0,64512,0,0,0,64512,0,0,0,0,64512,0,64512,0,0,0,0,0,0,64512]';
 
 module.exports = (red) => {
@@ -15,6 +15,7 @@ module.exports = (red) => {
             let sleepModeActive = context.get("sleepModeActive") || false;
             let sendOverHTTPActive = true;
             let mqttMasterTopic = tools.getValue(red, config.masterTopic, msg) || "";
+            const uuid = config.uuid;
 
             // Clean Master Topic
             if (mqttMasterTopic.substr(mqttMasterTopic.length - 1) === "/") {
@@ -413,6 +414,8 @@ module.exports = (red) => {
                 let webBmp = errorImage;
                 let webResult;
 
+
+
                 if (input) {
                     if (String(input).includes(",")) {
                         return input;
@@ -425,7 +428,7 @@ module.exports = (red) => {
                     }
 
                     try {
-                        const res = await axios.get(`https://pixelit.bastelbunker.de/API/GetBMPByID/${input}`, {
+                        const res = await axios.get(`https://pixelit.bastelbunker.de/API/GetBMPByID/${input}?uuid=${uuid}`, {
                             headers: {
                                 "User-Agent": "Node_Red_Core",
                                 "Content-type": "application/json; charset=utf-8",
@@ -434,7 +437,7 @@ module.exports = (red) => {
                         });
                         webResult = res.data;
                     } catch (error) {
-						node.status({
+                        node.status({
                             fill: "red",
                             shape: "dot",
                             text: `Failed to download icon ${input}. Check Node-RED log.`,
@@ -443,7 +446,7 @@ module.exports = (red) => {
                         webResult = undefined;
                     }
 
-                    if (webResult && webResult.id && webResult.id != 0) {
+                    if (webResult?.id != 0) {
                         webBmp = webResult.rgB565Array;
                         context.set(`bmpCache_${input}`, webBmp);
                     }
