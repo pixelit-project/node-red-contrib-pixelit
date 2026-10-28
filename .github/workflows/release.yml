@@ -1,25 +1,36 @@
 name: Release
 
-# Run this job on all pushes and pull requests
-# as well as tags with a semantic version
 on:
   release:
-    types: [created]
+    types: [published]
+
+permissions:
+  contents: read
 
 jobs:
-  # Deploys the final package to NPM (only if commit includes a version tag !
   deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [22.x]
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v6
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '24.x'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      - name: Install npm with trusted publishing support
+        run: npm install --global npm@11
+
+      - name: Verify release version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          node -e 'const version = require("./package.json").version; if (process.env.RELEASE_TAG !== version && process.env.RELEASE_TAG !== `v${version}`) { console.error("Release tag must match package.json version"); process.exit(1); }'
 
       - name: Install Dependencies
         run: npm ci
@@ -30,8 +41,5 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Publish package to npm
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-          npm whoami
-          npm publish
+      - name: Publish package to npm using OIDC
+        run: npm publish

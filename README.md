@@ -72,6 +72,20 @@ checked in a real Node-RED installation before release.
 
 ![Example](https://www.bastelbunker.de/Pixelit_nodered.png)
 
+## Publishing releases
+
+The `release.yml` workflow publishes through npm Trusted Publishing (GitHub
+OIDC), without an `NPM_TOKEN` secret. The npm package's trusted publisher must
+allow `npm publish` for `pixelit-project/node-red-contrib-pixelit` and workflow
+filename `release.yml`, with no environment name.
+
+Bump the version in `package.json` and `package-lock.json`, commit and push the
+changes, then publish a GitHub release whose tag matches that version (for
+example `v0.4.1`). Draft releases do not publish. The workflow verifies the tag,
+installs dependencies, runs checks and tests, and publishes using Node.js 24 and
+npm 11. The first successful publish validates the npm trusted publisher; remove
+unused legacy publishing tokens after confirming that it succeeded.
+
 ## Changelog
 
 ### Unreleased
