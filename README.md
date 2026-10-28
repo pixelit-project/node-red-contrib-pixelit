@@ -111,6 +111,10 @@ unused legacy publishing tokens after confirming that it succeeded.
 
 ## Changelog
 
+### Unreleased
+
+-   (o0shojo0o) Keep PixelIt HTTP failures visible in node status without repeated debug warnings; log each outage and recovery once per screen/config endpoint. Bitmap errors remain warnings. Fixes [#90](https://github.com/pixelit-project/node-red-contrib-pixelit/issues/90).
+
 ### 0.5.1 (2026-10-28)
 
 -   (o0shojo0o) Bound the bitmap cache to 100 entries / 1 MiB with least-recently-used eviction.

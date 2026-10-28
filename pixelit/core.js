@@ -41,6 +41,10 @@ module.exports = (red) => {
             bitmapCache.set(key, { value, bytes });
             cacheBytes += bytes;
         }
+        const failedTargets = new Set();
+        function reportRecovery(target) {
+            if (failedTargets.delete(target)) node.log(`${target}: Connection restored`);
+        }
         function reportFailure(target, error, fill) {
             let reason = "Connection failed";
             if (error.status) reason = `HTTP ${error.status}`;
@@ -49,7 +53,12 @@ module.exports = (red) => {
             // Do not log request URLs, bodies or raw errors, which may contain credentials.
             const text = `${target}: ${reason}`;
             node.status({ fill, shape: "dot", text });
-            node.warn(text);
+            if (target === "PixelIt screen" || target === "PixelIt config") {
+                if (!failedTargets.has(target)) node.log(text);
+                failedTargets.add(target);
+            } else {
+                node.warn(text);
+            }
         }
         async function request(url, body, operation) {
             const response = await fetch(url, {
@@ -465,6 +474,7 @@ module.exports = (red) => {
                     if (sendOverHTTPActive) {
                         try {
                             await request(`http://${config.ip}/api/config`, myjson);
+                            if (!closed) reportRecovery("PixelIt config");
                         } catch (error) {
                             if (closed) return;
                             reportFailure("PixelIt config", error, "yellow");
@@ -484,6 +494,7 @@ module.exports = (red) => {
                     if (sendOverHTTPActive) {
                         try {
                             await request(`http://${config.ip}/api/screen`, myjson, operation);
+                            if (current(operation)) reportRecovery("PixelIt screen");
                         } catch (error) {
                             if (!current(operation)) return;
                             reportFailure("PixelIt screen", error, "yellow");

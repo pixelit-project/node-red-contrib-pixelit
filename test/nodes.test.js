@@ -8,7 +8,7 @@ const path = require('node:path');
 function build(file, config = {}, credentials, fetchImpl = async () => { throw new Error("Unexpected HTTP request"); }) {
     let Constructor, registration;
     const handlers = {}, store = new Map(), timers = new Map();
-    const sent = [], errors = [], statuses = [], warnings = [];
+    const sent = [], errors = [], statuses = [], warnings = [], logs = [];
     let timerId = 0;
     const red = {
         nodes: {
@@ -20,6 +20,7 @@ function build(file, config = {}, credentials, fetchImpl = async () => { throw n
                 node.send = msg => sent.push(msg);
                 node.error = error => errors.push(error);
                 node.warn = warning => warnings.push(warning);
+                node.log = message => logs.push(message);
                 node.status = status => statuses.push(status);
             }
         },
@@ -36,7 +37,7 @@ function build(file, config = {}, credentials, fetchImpl = async () => { throw n
     vm.runInNewContext(source, sandbox, { filename: file });
     sandbox.module.exports(red);
     new Constructor(config);
-    return { handlers, store, timers, sent, errors, statuses, warnings, registration };
+    return { handlers, store, timers, sent, errors, statuses, warnings, logs, registration };
 }
 
 for (const payload of [undefined, null, {}, [null], [{ screenName: 'ok' }, {}]]) {
@@ -199,6 +200,35 @@ for (const topic of ['matrix_control', 'matrix_config']) {
         assert.equal(n.sent.length, 1);
         assert.equal(n.statuses.at(-1).fill, 'yellow');
         assert.equal(n.errors.length, 0);
+    });
+}
+
+for (const topic of ['matrix_control', 'matrix_config']) {
+    test(`${topic}: log outages and recovery once without debug warnings`, async () => {
+        let offline = true;
+        const n = build('core.js', { ip: '192.0.2.1' }, undefined, async () => {
+            if (offline) {
+                const error = new Error('private connection details');
+                error.name = 'TimeoutError';
+                throw error;
+            }
+            return new Response('');
+        });
+        for (let i = 0; i < 3; i++) await n.handlers.input({ topic });
+        assert.equal(n.logs.length, 1);
+        assert.match(n.logs[0], /Timeout after 1000 ms/);
+        assert.equal(n.statuses.at(-1).text, n.logs[0]);
+        offline = false;
+        for (let i = 0; i < 2; i++) await n.handlers.input({ topic });
+        assert.equal(n.logs.length, 2);
+        assert.match(n.logs[1], /Connection restored/);
+        offline = true;
+        await n.handlers.input({ topic });
+        assert.equal(n.logs.length, 3);
+        assert.equal(n.warnings.length, 0);
+        assert.equal(n.errors.length, 0);
+        assert.equal(n.sent.length, 6);
+        assert.ok(n.logs.every(message => !message.includes('private')));
     });
 }
 
