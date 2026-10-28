@@ -88,15 +88,16 @@ unused legacy publishing tokens after confirming that it succeeded.
 
 ## Changelog
 
-### Unreleased
+### 0.5.0 (2026-10-28)
 
-- Replace Axios with native fetch; abort HTTP requests after one second or on node close.
+**Requires Node.js 22 or newer.** Existing Matrix Config nodes should be opened, saved and deployed to migrate MQTT passwords to credentials.
 
-- Stop playlist timers and suppress late sends when Core is closed.
-- Validate playlists and durations; allow an empty playlist to stop rotation.
-- Fix dynamic Clock/Sound values and bitmap download error handling.
-- Store Matrix Config MQTT passwords in Node-RED credentials with legacy migration.
-- Require Node.js 22+, add regression tests, CI checks and an importable example.
+-   (o0shojo0o) Replace Axios with native fetch; abort HTTP requests after one second or on node close.
+-   (o0shojo0o) Stop playlist timers and suppress late sends when Core is closed.
+-   (o0shojo0o) Validate playlists and durations; allow an empty playlist to stop rotation.
+-   (o0shojo0o) Fix dynamic Clock/Sound values and bitmap download error handling.
+-   (o0shojo0o) Store Matrix Config MQTT passwords in Node-RED credentials with legacy migration.
+-   (o0shojo0o) Require Node.js 22+, add regression tests, CI checks and an importable example.
 
 ### 0.4.0 (2024-10-07)
 
