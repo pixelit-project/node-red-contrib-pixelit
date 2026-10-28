@@ -1,0 +1,143 @@
+[
+  {
+    "id": "animations",
+    "type": "tab",
+    "label": "Animations: bitmap frames and transitions",
+    "disabled": false,
+    "info": "Click Show animation to display two inline RGB565 frames for five seconds with a random screen transition. No bitmap API access is needed."
+  },
+  {
+    "id": "animations-1",
+    "type": "debug",
+    "z": "animations",
+    "name": "Inspect outgoing MQTT message",
+    "x": 1120,
+    "y": 360,
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "wires": []
+  },
+  {
+    "name": "Set IP for HTTP or connect MQTT Out",
+    "uuid": "",
+    "ip": "",
+    "masterTopic": "pixelit",
+    "id": "animations-2",
+    "type": "Core",
+    "z": "animations",
+    "x": 850,
+    "y": 360,
+    "wires": [
+      [
+        "animations-1"
+      ]
+    ]
+  },
+  {
+    "id": "animations-3",
+    "type": "comment",
+    "z": "animations",
+    "name": "Animations: bitmap frames and transitions",
+    "x": 380,
+    "y": 40,
+    "info": "Click Show animation to display two inline RGB565 frames for five seconds with a random screen transition. No bitmap API access is needed.\n\nCore has no IP initially, so messages only appear in Debug. For a device, enter its IP or connect Core to a built-in MQTT Out node using msg.topic. All Inject nodes are manual; nothing runs on deploy.",
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "animations-4",
+    "type": "inject",
+    "z": "animations",
+    "name": "Show animation",
+    "x": 110,
+    "y": 160,
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "wires": [
+      [
+        "animations-5"
+      ]
+    ]
+  },
+  {
+    "name": "Animation for 5 seconds",
+    "inscreenName": "animation",
+    "induration": "5",
+    "id": "animations-5",
+    "type": "Screen Init",
+    "z": "animations",
+    "x": 330,
+    "y": 160,
+    "wires": [
+      [
+        "animations-6"
+      ]
+    ]
+  },
+  {
+    "name": "Two inline frames",
+    "indata": "[63488,0,0,0,0,0,0,63488,0,63488,0,0,0,0,63488,0,0,0,63488,0,0,63488,0,0,0,0,0,63488,63488,0,0,0,0,0,0,63488,63488,0,0,0,0,0,63488,0,0,63488,0,0,0,63488,0,0,0,0,63488,0,63488,0,0,0,0,0,0,63488],[2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0,2016,0]",
+    "inanimationDelay": "300",
+    "inrubberbanding": "false",
+    "inlimitLoops": "0",
+    "id": "animations-6",
+    "type": "Bitmap Animation",
+    "z": "animations",
+    "x": 540,
+    "y": 160,
+    "wires": [
+      [
+        "animations-7"
+      ]
+    ]
+  },
+  {
+    "name": "Random transition",
+    "aktiv": "true",
+    "animation": "random",
+    "indata": "",
+    "inwidth": "8",
+    "incolorHex": null,
+    "incolorR": "255",
+    "incolorG": "255",
+    "incolorB": "255",
+    "id": "animations-7",
+    "type": "Switch Animation",
+    "z": "animations",
+    "x": 540,
+    "y": 260,
+    "wires": [
+      [
+        "animations-8"
+      ]
+    ]
+  },
+  {
+    "name": "Display immediately",
+    "id": "animations-8",
+    "type": "Alert Screen",
+    "z": "animations",
+    "x": 700,
+    "y": 260,
+    "wires": [
+      [
+        "animations-2"
+      ]
+    ]
+  }
+]

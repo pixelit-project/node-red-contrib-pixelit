@@ -1,0 +1,340 @@
+[
+  {
+    "id": "controls",
+    "type": "tab",
+    "label": "Controls: brightness, sleep, sound, GPIO and settings",
+    "disabled": false,
+    "info": "Manual examples for Matrix Control, Sound, GPIO Control and Matrix Config. Configure the GPIO pin for your wiring before sending. Sound requires compatible audio hardware. Matrix Config applies all its fields: review device and MQTT settings before clicking Apply settings. Its output can contain credentials; its Debug node is disabled by default."
+  },
+  {
+    "id": "controls-1",
+    "type": "debug",
+    "z": "controls",
+    "name": "Inspect outgoing MQTT message",
+    "x": 1120,
+    "y": 360,
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "wires": []
+  },
+  {
+    "name": "Set IP for HTTP or connect MQTT Out",
+    "uuid": "",
+    "ip": "",
+    "masterTopic": "pixelit",
+    "id": "controls-2",
+    "type": "Core",
+    "z": "controls",
+    "x": 850,
+    "y": 360,
+    "wires": [
+      [
+        "controls-1"
+      ]
+    ]
+  },
+  {
+    "id": "controls-3",
+    "type": "comment",
+    "z": "controls",
+    "name": "Controls: brightness, sleep, sound, GPIO and settings",
+    "x": 380,
+    "y": 40,
+    "info": "Manual examples for Matrix Control, Sound, GPIO Control and Matrix Config. Configure the GPIO pin for your wiring before sending. Sound requires compatible audio hardware. Matrix Config applies all its fields: review device and MQTT settings before clicking Apply settings. Its output can contain credentials; its Debug node is disabled by default.\n\nCore has no IP initially, so messages only appear in Debug. For a device, enter its IP or connect Core to a built-in MQTT Out node using msg.topic. All Inject nodes are manual; nothing runs on deploy.",
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "controls-4",
+    "type": "inject",
+    "z": "controls",
+    "name": "Set brightness to 40",
+    "x": 150,
+    "y": 120,
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "brightness",
+        "v": "40",
+        "vt": "num"
+      }
+    ],
+    "payload": "",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "wires": [
+      [
+        "controls-5"
+      ]
+    ]
+  },
+  {
+    "name": "Set brightness to 40",
+    "id": "controls-5",
+    "type": "Matrix Control",
+    "z": "controls",
+    "x": 500,
+    "y": 120,
+    "wires": [
+      [
+        "controls-2"
+      ]
+    ]
+  },
+  {
+    "id": "controls-6",
+    "type": "inject",
+    "z": "controls",
+    "name": "Sleep",
+    "x": 150,
+    "y": 200,
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "sleepMode",
+        "v": "true",
+        "vt": "bool"
+      }
+    ],
+    "payload": "",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "wires": [
+      [
+        "controls-7"
+      ]
+    ]
+  },
+  {
+    "name": "Sleep",
+    "id": "controls-7",
+    "type": "Matrix Control",
+    "z": "controls",
+    "x": 500,
+    "y": 200,
+    "wires": [
+      [
+        "controls-2"
+      ]
+    ]
+  },
+  {
+    "id": "controls-8",
+    "type": "inject",
+    "z": "controls",
+    "name": "Wake",
+    "x": 150,
+    "y": 280,
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "sleepMode",
+        "v": "false",
+        "vt": "bool"
+      }
+    ],
+    "payload": "",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "wires": [
+      [
+        "controls-9"
+      ]
+    ]
+  },
+  {
+    "name": "Wake",
+    "id": "controls-9",
+    "type": "Matrix Control",
+    "z": "controls",
+    "x": 500,
+    "y": 280,
+    "wires": [
+      [
+        "controls-2"
+      ]
+    ]
+  },
+  {
+    "id": "controls-10",
+    "type": "inject",
+    "z": "controls",
+    "name": "Play audio file 1",
+    "x": 150,
+    "y": 440,
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "wires": [
+      [
+        "controls-11"
+      ]
+    ]
+  },
+  {
+    "name": "Volume 15, folder 0, file 1",
+    "inControl": "play",
+    "inVolume": "15",
+    "inFolder": "0",
+    "inFile": "1",
+    "id": "controls-11",
+    "type": "Sound",
+    "z": "controls",
+    "x": 480,
+    "y": 440,
+    "wires": [
+      [
+        "controls-12"
+      ]
+    ]
+  },
+  {
+    "name": "Send sound command",
+    "id": "controls-12",
+    "type": "Matrix Control",
+    "z": "controls",
+    "x": 690,
+    "y": 440,
+    "wires": [
+      [
+        "controls-2"
+      ]
+    ]
+  },
+  {
+    "id": "controls-13",
+    "type": "inject",
+    "z": "controls",
+    "name": "Pulse configured GPIO",
+    "x": 150,
+    "y": 540,
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "wires": [
+      [
+        "controls-14"
+      ]
+    ]
+  },
+  {
+    "name": "Review pin before use",
+    "gpio": "14",
+    "set": "true",
+    "duration": "1000",
+    "id": "controls-14",
+    "type": "GPIO Control",
+    "z": "controls",
+    "x": 480,
+    "y": 540,
+    "wires": [
+      [
+        "controls-15"
+      ]
+    ]
+  },
+  {
+    "name": "Send GPIO command",
+    "id": "controls-15",
+    "type": "Matrix Control",
+    "z": "controls",
+    "x": 690,
+    "y": 540,
+    "wires": [
+      [
+        "controls-2"
+      ]
+    ]
+  },
+  {
+    "id": "controls-16",
+    "type": "inject",
+    "z": "controls",
+    "name": "Apply settings (review first)",
+    "x": 180,
+    "y": 660,
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "wires": [
+      [
+        "controls-17"
+      ]
+    ]
+  },
+  {
+    "name": "Review all settings before use",
+    "matrixtBrightness": 85,
+    "matrixType": 1,
+    "matrixTempCorrection": "default",
+    "ntpServer": "de.pool.ntp.org",
+    "clockTimeZone": 1,
+    "scrollTextDefaultDelay": 110,
+    "bootScreenAktiv": "true",
+    "mqttAktiv": "false",
+    "mqttServer": "",
+    "mqttPort": 1883,
+    "mqttUser": "",
+    "mqttMasterTopic": "",
+    "id": "controls-17",
+    "type": "Matrix Config",
+    "z": "controls",
+    "x": 510,
+    "y": 660,
+    "wires": [
+      [
+        "controls-2"
+      ]
+    ]
+  }
+]

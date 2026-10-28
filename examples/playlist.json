@@ -1,0 +1,272 @@
+[
+  {
+    "id": "playlist",
+    "type": "tab",
+    "label": "Playlist: clock and bitmap",
+    "disabled": false,
+    "info": "Click Store clock and Store bitmap first, then Start playlist. Stop playlist sends an empty list. The inline bitmap requires no bitmap API or UUID."
+  },
+  {
+    "id": "playlist-1",
+    "type": "debug",
+    "z": "playlist",
+    "name": "Inspect outgoing MQTT message",
+    "x": 1120,
+    "y": 360,
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "wires": []
+  },
+  {
+    "name": "Set IP for HTTP or connect MQTT Out",
+    "uuid": "",
+    "ip": "",
+    "masterTopic": "pixelit",
+    "id": "playlist-2",
+    "type": "Core",
+    "z": "playlist",
+    "x": 850,
+    "y": 360,
+    "wires": [
+      [
+        "playlist-1"
+      ]
+    ]
+  },
+  {
+    "id": "playlist-3",
+    "type": "comment",
+    "z": "playlist",
+    "name": "Playlist: clock and bitmap",
+    "x": 380,
+    "y": 40,
+    "info": "Click Store clock and Store bitmap first, then Start playlist. Stop playlist sends an empty list. The inline bitmap requires no bitmap API or UUID.\n\nCore has no IP initially, so messages only appear in Debug. For a device, enter its IP or connect Core to a built-in MQTT Out node using msg.topic. All Inject nodes are manual; nothing runs on deploy.",
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "playlist-4",
+    "type": "inject",
+    "z": "playlist",
+    "name": "Store clock",
+    "x": 110,
+    "y": 140,
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "wires": [
+      [
+        "playlist-5"
+      ]
+    ]
+  },
+  {
+    "name": "clock for 5 seconds",
+    "inscreenName": "clock",
+    "induration": "5",
+    "id": "playlist-5",
+    "type": "Screen Init",
+    "z": "playlist",
+    "x": 310,
+    "y": 140,
+    "wires": [
+      [
+        "playlist-6"
+      ]
+    ]
+  },
+  {
+    "name": "Clock",
+    "inswitchAktiv": "false",
+    "inswitchSec": "5",
+    "inwithSeconds": "true",
+    "incolorHex": null,
+    "incolorR": "255",
+    "incolorG": "255",
+    "incolorB": "255",
+    "id": "playlist-6",
+    "type": "Clock",
+    "z": "playlist",
+    "x": 510,
+    "y": 140,
+    "wires": [
+      [
+        "playlist-7"
+      ]
+    ]
+  },
+  {
+    "name": "Store screen",
+    "id": "playlist-7",
+    "type": "Screen Data Update",
+    "z": "playlist",
+    "x": 680,
+    "y": 140,
+    "wires": [
+      [
+        "playlist-2"
+      ]
+    ]
+  },
+  {
+    "id": "playlist-8",
+    "type": "inject",
+    "z": "playlist",
+    "name": "Store bitmap",
+    "x": 110,
+    "y": 260,
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "wires": [
+      [
+        "playlist-9"
+      ]
+    ]
+  },
+  {
+    "name": "bitmap for 5 seconds",
+    "inscreenName": "bitmap",
+    "induration": "5",
+    "id": "playlist-9",
+    "type": "Screen Init",
+    "z": "playlist",
+    "x": 310,
+    "y": 260,
+    "wires": [
+      [
+        "playlist-10"
+      ]
+    ]
+  },
+  {
+    "name": "Bitmap",
+    "indata": "[63488,0,0,0,0,0,0,63488,0,63488,0,0,0,0,63488,0,0,0,63488,0,0,63488,0,0,0,0,0,63488,63488,0,0,0,0,0,0,63488,63488,0,0,0,0,0,63488,0,0,63488,0,0,0,63488,0,0,0,0,63488,0,63488,0,0,0,0,0,0,63488]",
+    "inposX": "0",
+    "inposY": "0",
+    "inwidth": "8",
+    "inheight": "8",
+    "id": "playlist-10",
+    "type": "Bitmap",
+    "z": "playlist",
+    "x": 510,
+    "y": 260,
+    "wires": [
+      [
+        "playlist-11"
+      ]
+    ]
+  },
+  {
+    "name": "Store screen",
+    "id": "playlist-11",
+    "type": "Screen Data Update",
+    "z": "playlist",
+    "x": 680,
+    "y": 260,
+    "wires": [
+      [
+        "playlist-2"
+      ]
+    ]
+  },
+  {
+    "id": "playlist-12",
+    "type": "inject",
+    "z": "playlist",
+    "name": "Start playlist",
+    "x": 150,
+    "y": 440,
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "[{\"screenName\":\"clock\"},{\"screenName\":\"bitmap\"}]",
+    "payloadType": "json",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "wires": [
+      [
+        "playlist-13"
+      ]
+    ]
+  },
+  {
+    "name": "Start playlist",
+    "id": "playlist-13",
+    "type": "Playlist Update",
+    "z": "playlist",
+    "x": 470,
+    "y": 440,
+    "wires": [
+      [
+        "playlist-2"
+      ]
+    ]
+  },
+  {
+    "id": "playlist-14",
+    "type": "inject",
+    "z": "playlist",
+    "name": "Stop playlist",
+    "x": 150,
+    "y": 520,
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "[]",
+    "payloadType": "json",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "wires": [
+      [
+        "playlist-15"
+      ]
+    ]
+  },
+  {
+    "name": "Stop playlist",
+    "id": "playlist-15",
+    "type": "Playlist Update",
+    "z": "playlist",
+    "x": 470,
+    "y": 520,
+    "wires": [
+      [
+        "playlist-2"
+      ]
+    ]
+  }
+]

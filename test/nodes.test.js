@@ -256,3 +256,42 @@ test('close aborts concurrent HTTP requests without warning statuses or late sen
     assert.equal(n.timers.size, 0);
     assert.equal(n.errors.length, 0);
 });
+
+for (const file of fs.readdirSync(path.join(__dirname, '../examples')).filter(file => file.endsWith('.json'))) {
+    test(`example ${file}: all manual paths execute and produce valid Core output`, async () => {
+        const flow = JSON.parse(fs.readFileSync(path.join(__dirname, '../examples', file), 'utf8'));
+        const runtimeByType = {};
+        for (const runtime of Object.values(require('../package.json')['node-red'].nodes)) {
+            require('../' + runtime)({ nodes: { registerType(type) { runtimeByType[type] = path.basename(runtime); } } });
+        }
+        const instances = new Map(flow.filter(node => runtimeByType[node.type]).map(node => [node.id, build(runtimeByType[node.type], node)]));
+        const nodes = new Map(flow.map(node => [node.id, node]));
+        async function deliver(id, msg) {
+            const instance = instances.get(id);
+            if (!instance) return;
+            const previous = instance.sent.length;
+            await instance.handlers.input(msg);
+            assert.equal(instance.errors.length, 0, `${file}: ${nodes.get(id).type}`);
+            for (const output of instance.sent.slice(previous)) {
+                if (nodes.get(id).type === 'Core') {
+                    if (typeof output.payload === 'string') JSON.parse(output.payload);
+                    assert.match(output.topic, /^pixelit\/set(Screen|Config)$/);
+                }
+                for (const target of (nodes.get(id).wires || []).flat()) {
+                    await deliver(target, structuredClone(output));
+                }
+            }
+        }
+        for (const inject of flow.filter(node => node.type === 'inject')) {
+            assert.equal(inject.once, false);
+            const msg = { payload: inject.payloadType === 'json' ? JSON.parse(inject.payload) : inject.payload };
+            for (const prop of inject.props) {
+                if (prop.p !== 'payload') msg[prop.p] = prop.vt === 'bool' ? prop.v === 'true' : prop.vt === 'num' ? Number(prop.v) : prop.v;
+            }
+            for (const target of inject.wires.flat()) await deliver(target, structuredClone(msg));
+        }
+        const cores = flow.filter(node => node.type === 'Core');
+        assert.ok(cores.every(node => instances.get(node.id).sent.length > 0));
+        for (const instance of instances.values()) instance.handlers.close?.();
+    });
+}

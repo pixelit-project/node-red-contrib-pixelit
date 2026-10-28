@@ -113,5 +113,15 @@
     "x": 1220,
     "y": 100,
     "wires": []
+  },
+  {
+    "id": "pixelit-help",
+    "type": "comment",
+    "z": "pixelit-example",
+    "name": "Start here: configure Core, then click Display text",
+    "info": "Set your PixelIt IP in Core for HTTP, or connect Core to a built-in MQTT Out node using msg.topic. Without an IP or MQTT connection, inspect the generated message in Debug. Click Display text to show a five-second text alert. No third-party nodes are needed.",
+    "x": 400,
+    "y": 40,
+    "wires": []
   }
 ]

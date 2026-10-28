@@ -39,6 +39,23 @@ Core**. An empty array stops rotation. Each screen needs a positive duration in
 seconds, at most 2147483. Invalid playlists are rejected without replacing the
 current playlist. Alerts temporarily interrupt rotation; sleep mode pauses it.
 
+## Example flows
+
+Find these in **Import → Examples → node-red-contrib-pixelit** or import the JSON
+files directly. Every package node is demonstrated, using only this package and
+built-in Node-RED nodes:
+
+- [quick-start.json](examples/quick-start.json): Screen Init, Text, Alert Screen and Core.
+- [playlist.json](examples/playlist.json): Clock, Bitmap, Screen Data Update and Playlist Update. Store both screens before starting playback; an empty playlist stops rotation.
+- [animations.json](examples/animations.json): Bitmap Animation and Switch Animation, using inline frames without API downloads.
+- [controls.json](examples/controls.json): Matrix Control, Sound, GPIO Control and Matrix Config. Review the GPIO pin, audio hardware and all configuration fields before sending to a device. Debug is disabled because configuration messages can contain credentials.
+
+All Inject nodes are manual. Core starts without a device IP so importing and
+deploying only prepares the examples. Set an IP for HTTP or connect an MQTT Out
+node using `msg.topic` to control a device. `npm run check` checks JSON, wire
+references and coverage of all registered non-config node types, including nested
+example directories.
+
 ## Existing MQTT passwords
 
 Matrix Config now stores its MQTT password using Node-RED credentials. Existing
@@ -87,6 +104,10 @@ npm 11. The first successful publish validates the npm trusted publisher; remove
 unused legacy publishing tokens after confirming that it succeeded.
 
 ## Changelog
+
+### Unreleased
+
+-   (o0shojo0o) Add example flows covering all 14 nodes and validate example coverage automatically.
 
 ### 0.5.0 (2026-10-28)
 
