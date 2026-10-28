@@ -70,6 +70,12 @@ Matrix Config must still send the password to the device when applying its MQTT
 configuration. Its output messages therefore contain the password: avoid
 logging or exporting those messages.
 
+## HTTP requests and bitmap caching
+
+Core caches up to 100 bitmaps (1 MiB total), removing least recently used entries
+first. New screen commands cancel outdated requests. HTTP requests time out after
+one second; failures appear in the node status and Node-RED log.
+
 ## Development
 
 ```sh
@@ -106,6 +112,10 @@ unused legacy publishing tokens after confirming that it succeeded.
 ## Changelog
 
 ### Unreleased
+
+-   (o0shojo0o) Bound the bitmap cache to 100 entries / 1 MiB with least-recently-used eviction.
+-   (o0shojo0o) Cancel superseded screen requests and discard stale responses and error statuses.
+-   (o0shojo0o) Distinguish HTTP errors, timeouts, connection failures and invalid bitmap responses in node status and logs.
 
 -   (o0shojo0o) Add example flows covering all 14 nodes and validate example coverage automatically.
 

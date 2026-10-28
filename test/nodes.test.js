@@ -8,7 +8,7 @@ const path = require('node:path');
 function build(file, config = {}, credentials, fetchImpl = async () => { throw new Error("Unexpected HTTP request"); }) {
     let Constructor, registration;
     const handlers = {}, store = new Map(), timers = new Map();
-    const sent = [], errors = [], statuses = [];
+    const sent = [], errors = [], statuses = [], warnings = [];
     let timerId = 0;
     const red = {
         nodes: {
@@ -19,6 +19,7 @@ function build(file, config = {}, credentials, fetchImpl = async () => { throw n
                 node.context = () => ({ get: key => store.get(key), set: (key, value) => store.set(key, value) });
                 node.send = msg => sent.push(msg);
                 node.error = error => errors.push(error);
+                node.warn = warning => warnings.push(warning);
                 node.status = status => statuses.push(status);
             }
         },
@@ -28,14 +29,14 @@ function build(file, config = {}, credentials, fetchImpl = async () => { throw n
     const sandbox = {
         module: { exports: {} }, console: { log() {} },
         require: () => require('../pixelit/lib/tools'),
-        fetch: fetchImpl, AbortController, AbortSignal,
+        fetch: fetchImpl, AbortController, AbortSignal, Buffer,
         setTimeout(fn, delay) { const id = ++timerId; timers.set(id, { fn, delay }); return id; },
         clearTimeout: id => timers.delete(id)
     };
     vm.runInNewContext(source, sandbox, { filename: file });
     sandbox.module.exports(red);
     new Constructor(config);
-    return { handlers, store, timers, sent, errors, statuses, registration };
+    return { handlers, store, timers, sent, errors, statuses, warnings, registration };
 }
 
 for (const payload of [undefined, null, {}, [null], [{ screenName: 'ok' }, {}]]) {
@@ -295,3 +296,105 @@ for (const file of fs.readdirSync(path.join(__dirname, '../examples')).filter(fi
         for (const instance of instances.values()) instance.handlers.close?.();
     });
 }
+
+test('bitmap cache evicts the least recently used ID at 100 entries', async () => {
+    const calls = [];
+    const n = build('core.js', {}, undefined, async url => {
+        const id = Number(url.match(/GetBMPByID\/(\d+)/)[1]);
+        calls.push(id);
+        return new Response(JSON.stringify({ id, rgB565Array: '[1,2]' }));
+    });
+    async function show(id) { await n.handlers.input({ topic: 'matrix_control', bitmap: { data: id } }); }
+    for (let id = 1; id <= 100; id++) await show(id);
+    await show(1); // Refresh oldest entry.
+    await show(101);
+    await show(1);
+    assert.equal(calls.filter(id => id === 1).length, 1);
+    await show(2);
+    assert.equal(calls.filter(id => id === 2).length, 2);
+    assert.equal(n.errors.length, 0);
+});
+
+test('bitmap cache also enforces the total byte budget', async () => {
+    let calls = 0;
+    const data = '[' + '1,'.repeat(300000) + '1]';
+    const n = build('core.js', {}, undefined, async () => {
+        calls++;
+        return new Response(JSON.stringify({ id: 1, rgB565Array: data }));
+    });
+    for (const id of [1, 1, 2, 1]) await n.handlers.input({ topic: 'matrix_control', bitmap: { data: id } });
+    assert.equal(calls, 3);
+});
+
+test('a late bitmap response cannot overwrite a newer screen or enter the cache', async () => {
+    let resolve, signal, calls = 0;
+    const n = build('core.js', {}, undefined, async (url, options) => {
+        calls++;
+        signal = options.signal;
+        if (calls === 1) return new Promise(r => { resolve = r; });
+        return new Response(JSON.stringify({ id: 42, rgB565Array: '[1,2]' }));
+    });
+    const old = n.handlers.input({ topic: 'alert_screen', duration: 5, bitmap: { data: 42 } });
+    await n.handlers.input({ topic: 'alert_screen', duration: 5, text: { textString: 'new' } });
+    assert.equal(signal.aborted, true);
+    resolve(new Response(JSON.stringify({ id: 42, rgB565Array: '[3,4]' })));
+    await old;
+    assert.equal(n.sent.length, 1);
+    assert.equal(JSON.parse(n.sent[0].payload).text.textString, 'new');
+    assert.equal(n.warnings.length, 0);
+    await n.handlers.input({ topic: 'matrix_control', bitmap: { data: 42 } });
+    assert.equal(calls, 2);
+});
+
+for (const action of ['stop', 'sleep', 'alert']) {
+    test(`${action} invalidates an in-flight playlist download`, async () => {
+        let signal;
+        const n = build('core.js', {}, undefined, (url, options) => {
+            signal = options.signal;
+            return untilAborted(signal);
+        });
+        n.store.set('old', { duration: 5, bitmap: { data: 42 } });
+        const old = n.handlers.input({ topic: 'playlist_update', payload: [{ screenName: 'old' }] });
+        if (action === 'stop') await n.handlers.input({ topic: 'playlist_update', payload: [] });
+        if (action === 'sleep') await n.handlers.input({ topic: 'matrix_control', sleepMode: true });
+        if (action === 'alert') await n.handlers.input({ topic: 'alert_screen', duration: 5, text: { textString: 'alert' } });
+        await old;
+        assert.equal(signal.aborted, true);
+        assert.equal(n.sent.length, action === 'stop' ? 0 : 1);
+        assert.equal(n.warnings.length, 0);
+    });
+}
+
+test('late screen HTTP errors do not overwrite a newer status', async () => {
+    let reject, calls = 0;
+    const n = build('core.js', { ip: '192.0.2.1' }, undefined, () => {
+        if (++calls === 1) return new Promise((resolve, r) => { reject = r; });
+        return Promise.resolve(new Response('OK'));
+    });
+    const old = n.handlers.input({ topic: 'matrix_control', brightness: 10 });
+    // Let the first request reach fetch before sending a second command.
+    await Promise.resolve();
+    await n.handlers.input({ topic: 'matrix_control', brightness: 20 });
+    const status = n.statuses.at(-1);
+    reject(new TypeError('fetch failed'));
+    await old;
+    assert.equal(n.statuses.at(-1), status);
+    assert.equal(n.warnings.length, 0);
+});
+
+test('diagnostics distinguish HTTP, timeout, connection and invalid JSON without leaking secrets', async () => {
+    const cases = [
+        [async () => new Response('', { status: 503 }), 'HTTP 503'],
+        [async () => { const e = new Error('secret uuid password'); e.name = 'TimeoutError'; throw e; }, 'Timeout after 1000 ms'],
+        [async () => { throw new TypeError('secret uuid password'); }, 'Connection failed'],
+        [async () => new Response('invalid'), 'Invalid bitmap response']
+    ];
+    for (const [fetchImpl, expected] of cases) {
+        const n = build('core.js', { uuid: 'secret uuid password' }, undefined, fetchImpl);
+        await n.handlers.input({ topic: 'matrix_control', bitmap: { data: 42 } });
+        assert.equal(n.warnings.length, 1);
+        assert.ok(n.warnings[0].includes(expected));
+        assert.equal(n.warnings[0].includes('secret'), false);
+        assert.equal(n.statuses.at(-1).text, n.warnings[0]);
+    }
+});

@@ -11,7 +11,47 @@ module.exports = (red) => {
         const node = this;
 
         const shutdown = new AbortController();
-        async function request(url, body) {
+        const bitmapCache = new Map();
+        // Drop the unbounded cache left in context by earlier versions.
+        for (const key of context.keys?.() || []) {
+            if (key.startsWith("bmpCache_")) context.set(key, undefined);
+        }
+        let cacheBytes = 0;
+        let activeScreen;
+        function beginScreen() {
+            activeScreen?.abort();
+            activeScreen = new AbortController();
+            return activeScreen;
+        }
+        function current(operation) {
+            return !closed && operation === activeScreen && !operation.signal.aborted;
+        }
+        function cacheBitmap(key, value) {
+            const bytes = Buffer.byteLength(value, "utf8");
+            if (bytes > 1024 * 1024) return;
+            if (bitmapCache.has(key)) {
+                cacheBytes -= bitmapCache.get(key).bytes;
+                bitmapCache.delete(key);
+            }
+            while (bitmapCache.size >= 100 || cacheBytes + bytes > 1024 * 1024) {
+                const oldest = bitmapCache.keys().next().value;
+                cacheBytes -= bitmapCache.get(oldest).bytes;
+                bitmapCache.delete(oldest);
+            }
+            bitmapCache.set(key, { value, bytes });
+            cacheBytes += bytes;
+        }
+        function reportFailure(target, error, fill) {
+            let reason = "Connection failed";
+            if (error.status) reason = `HTTP ${error.status}`;
+            else if (error.name === "TimeoutError") reason = "Timeout after 1000 ms";
+            else if (error.name === "SyntaxError" || error.code === "INVALID_BITMAP") reason = "Invalid bitmap response";
+            // Do not log request URLs, bodies or raw errors, which may contain credentials.
+            const text = `${target}: ${reason}`;
+            node.status({ fill, shape: "dot", text });
+            node.warn(text);
+        }
+        async function request(url, body, operation) {
             const response = await fetch(url, {
                 method: body === undefined ? "GET" : "POST",
                 headers: {
@@ -19,11 +59,13 @@ module.exports = (red) => {
                     "Content-type": "application/json; charset=utf-8",
                 },
                 body: body === undefined ? undefined : typeof body === "string" ? body : JSON.stringify(body),
-                signal: AbortSignal.any([shutdown.signal, AbortSignal.timeout(1000)]),
+                signal: AbortSignal.any([shutdown.signal, AbortSignal.timeout(1000), ...(operation ? [operation.signal] : [])]),
             });
             if (!response.ok) {
                 await response.body?.cancel();
-                throw new Error(`HTTP ${response.status}`);
+                const error = new Error(`HTTP ${response.status}`);
+                error.status = response.status;
+                throw error;
             }
             // Read the body before finishing so the timeout also covers slow responses.
             if (body === undefined) return response.json();
@@ -46,6 +88,9 @@ module.exports = (red) => {
         this.on("close", () => {
             closed = true;
             shutdown.abort();
+            activeScreen?.abort();
+            bitmapCache.clear();
+            cacheBytes = 0;
             stopTimer();
         });
 
@@ -99,6 +144,7 @@ module.exports = (red) => {
 
                 // This topic sent by all providers to update the data in the context
                 if (msg.topic === "matrix_control") {
+                    const operation = beginScreen();
                     node.status({
                         fill: "grey",
                         shape: "ring",
@@ -115,14 +161,14 @@ module.exports = (red) => {
                             shape: "ring",
                             text: "Sleep Mode Active!",
                         });
-                        await sendToPixelItScreen(await createScreenJson(msg));
+                        await sendToPixelItScreen(await createScreenJson(msg, operation), operation);
                     } else if (msg.sleepMode != undefined && tools.booleanConvert(msg.sleepMode) == false) {
                         sleepModeActive = false;
                         context.set("sleepModeActive", sleepModeActive);
-                        await sendToPixelItScreen(await createScreenJson(msg));
-                        getNextScreen();
+                        await sendToPixelItScreen(await createScreenJson(msg, operation), operation);
+                        if (current(operation)) await getNextScreen();
                     } else if (sleepModeActive == false) {
-                        await sendToPixelItScreen(await createScreenJson(msg));
+                        await sendToPixelItScreen(await createScreenJson(msg, operation), operation);
                     }
                 }
 
@@ -148,6 +194,7 @@ module.exports = (red) => {
                 if (msg.topic === "playlist_update") {
                     if (Array.isArray(msg.payload) && msg.payload.every(item =>
                         item && typeof item.screenName === "string" && item.screenName.trim())) {
+                        beginScreen();
                         stopTimer();
                         context.set("screenPlayList", msg.payload);
                         node.status({
@@ -171,6 +218,7 @@ module.exports = (red) => {
                     if (!validDuration(msg.duration)) {
                         throw new Error("Alert duration must be a positive number of seconds (maximum 2147483)");
                     }
+                    const operation = beginScreen();
                     if (timeout) {
                         stopTimer();
                     }
@@ -190,7 +238,7 @@ module.exports = (red) => {
                         text: status,
                     });
 
-                    await sendToPixelItScreen(await createScreenJson(msg));
+                    await sendToPixelItScreen(await createScreenJson(msg, operation), operation);
                 }
 
                 async function getNextScreen() {
@@ -214,6 +262,7 @@ module.exports = (red) => {
                         nextScreenNumber = 0;
                     }
 
+                    const operation = beginScreen();
                     const nextScreenPlayListItem = screenPlayList[nextScreenNumber];
                     const nextScreen = context.get(nextScreenPlayListItem.screenName);
 
@@ -247,9 +296,10 @@ module.exports = (red) => {
 
                     schedule(getNextScreen, Number(nextScreen.duration) * 1000);
                     try {
-                        const nextScreenJson = await createScreenJson(nextScreen);
-                        await sendToPixelItScreen(nextScreenJson);
+                        const nextScreenJson = await createScreenJson(nextScreen, operation);
+                        await sendToPixelItScreen(nextScreenJson, operation);
                     } catch (error) {
+                        if (!current(operation)) return;
                         node.error(error);
                         node.status({
                             fill: "red",
@@ -259,7 +309,7 @@ module.exports = (red) => {
                     }
                 }
 
-                async function createScreenJson(msg) {
+                async function createScreenJson(msg, operation) {
                     // Remove Object Ref.
                     const jsonObj = JSON.parse(JSON.stringify(msg));
                     // SleepMode Overrides
@@ -278,7 +328,7 @@ module.exports = (red) => {
                     if (jsonObj.switchAnimation != undefined) {
                         jsonObj.switchAnimation.aktiv = tools.booleanConvert(jsonObj.switchAnimation.aktiv);
                         if (jsonObj.switchAnimation.data) {
-                            jsonObj.switchAnimation.data = JSON.parse(await getBitMap(jsonObj.switchAnimation.data));
+                            jsonObj.switchAnimation.data = JSON.parse(await getBitMap(jsonObj.switchAnimation.data, operation));
                             jsonObj.switchAnimation.width = Number(jsonObj.switchAnimation.width);
                         }
                         if (jsonObj.switchAnimation.color) {
@@ -290,7 +340,7 @@ module.exports = (red) => {
                     // Bitmap Overrides
                     if (jsonObj.bitmap) {
                         try {
-                            jsonObj.bitmap.data = JSON.parse(await getBitMap(jsonObj.bitmap.data));
+                            jsonObj.bitmap.data = JSON.parse(await getBitMap(jsonObj.bitmap.data, operation));
                         } catch (error) {
                             jsonObj.bitmap.data = JSON.parse(errorImage);
                         }
@@ -310,7 +360,7 @@ module.exports = (red) => {
                         }
                         jsonObj.bitmapAnimation.limitLoops = Number(jsonObj.bitmapAnimation.limitLoops);
                         try {
-                            jsonObj.bitmapAnimation.data = JSON.parse(`[${await getBitMap(jsonObj.bitmapAnimation.data)}]`);
+                            jsonObj.bitmapAnimation.data = JSON.parse(`[${await getBitMap(jsonObj.bitmapAnimation.data, operation)}]`);
                         } catch (error) {
                             jsonObj.bitmapAnimation.data = JSON.parse(`[${errorImage}]`);
                         }
@@ -417,17 +467,13 @@ module.exports = (red) => {
                             await request(`http://${config.ip}/api/config`, myjson);
                         } catch (error) {
                             if (closed) return;
-                            node.status({
-                                fill: "yellow",
-                                shape: "dot",
-                                text: "Cannot reach the Pixel It via http API..",
-                            });
+                            reportFailure("PixelIt config", error, "yellow");
                         }
                     }
                 }
 
-                async function sendToPixelItScreen(myjson) {
-                    if (closed) return;
+                async function sendToPixelItScreen(myjson, operation) {
+                    if (!current(operation)) return;
                     const result = {
                         topic: mqttMasterTopic + "/setScreen",
                         payload: myjson,
@@ -437,55 +483,51 @@ module.exports = (red) => {
 
                     if (sendOverHTTPActive) {
                         try {
-                            await request(`http://${config.ip}/api/screen`, myjson);
+                            await request(`http://${config.ip}/api/screen`, myjson, operation);
                         } catch (error) {
-                            if (closed) return;
-                            node.status({
-                                fill: "yellow",
-                                shape: "dot",
-                                text: "Cannot reach the Pixel It via http API..",
-                            });
+                            if (!current(operation)) return;
+                            reportFailure("PixelIt screen", error, "yellow");
                         }
                     }
                 }
 
-                async function getBitMap(input) {
-                    let webBmp = errorImage;
-                    let webResult;
-
-
-
-                    if (input) {
-                        if (String(input).includes(",")) {
-                            return input;
-                        }
-
-                        input = parseInt(input);
-                        const bmp = context.get(`bmpCache_${input}`);
-                        if (bmp) {
-                            return bmp;
-                        }
-
-                        try {
-                            webResult = await request(`https://pixelit.bastelbunker.de/API/GetBMPByID/${input}?uuid=${uuid}`);
-                        } catch (error) {
-                            if (closed) return;
-                            node.status({
-                                fill: "red",
-                                shape: "dot",
-                                text: `Failed to download icon ${input}. Check Node-RED log.`,
-                            });
-                            console.log(`PixelIt Core: Failed to download icon getBitMap(${input})!`, error.message);
-                            webResult = undefined;
-                        }
-
-                        if (webResult && webResult.id != null && webResult.id != 0 && typeof webResult.rgB565Array === "string") {
-                            webBmp = webResult.rgB565Array;
-                            context.set(`bmpCache_${input}`, webBmp);
-                        }
+                async function getBitMap(input, operation) {
+                    if (!current(operation) || !input) return errorImage;
+                    if (String(input).includes(",")) return input;
+                    const id = Number(input);
+                    if (!Number.isSafeInteger(id) || id <= 0) {
+                        reportFailure("Bitmap", { code: "INVALID_BITMAP" }, "red");
+                        return errorImage;
                     }
-                    return webBmp;
+                    const key = JSON.stringify([uuid || "", id]);
+                    const cached = bitmapCache.get(key);
+                    if (cached) {
+                        bitmapCache.delete(key);
+                        bitmapCache.set(key, cached);
+                        return cached.value;
+                    }
+                    try {
+                        const result = await request(`https://pixelit.bastelbunker.de/API/GetBMPByID/${id}?uuid=${encodeURIComponent(uuid || "")}`, undefined, operation);
+                        if (!current(operation)) return errorImage;
+                        if (!result || result.id == null || result.id == 0 || typeof result.rgB565Array !== "string") {
+                            const error = new Error("Invalid bitmap response");
+                            error.code = "INVALID_BITMAP";
+                            throw error;
+                        }
+                        const frames = JSON.parse(`[${result.rgB565Array}]`);
+                        if (!frames.length || !frames.every(Array.isArray)) {
+                            const error = new Error("Invalid bitmap response");
+                            error.code = "INVALID_BITMAP";
+                            throw error;
+                        }
+                        cacheBitmap(key, result.rgB565Array);
+                        return result.rgB565Array;
+                    } catch (error) {
+                        if (current(operation)) reportFailure(`Bitmap ${id}`, error, "red");
+                        return errorImage;
+                    }
                 }
+
             } catch (error) {
                 if (done) done(error);
                 else node.error(error, msg);
