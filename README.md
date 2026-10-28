@@ -1,16 +1,86 @@
 # node-red-contrib-pixelit
 
-[![NPM version](http://img.shields.io/npm/v/node-red-contrib-pixelit.svg)](https://www.npmjs.com/package/node-red-contrib-pixelit)
+[![NPM version](https://img.shields.io/npm/v/node-red-contrib-pixelit.svg)](https://www.npmjs.com/package/node-red-contrib-pixelit)
 [![Downloads](https://img.shields.io/npm/dm/node-red-contrib-pixelit.svg)](https://www.npmjs.com/package/node-red-contrib-pixelit)
-[![Known Vulnerabilities](https://snyk.io/test/github/o0shojo0o/node-red-contrib-pixelit/badge.svg)](https://snyk.io/test/github/ixelit-project/node-red-contrib-pixelit)
+[![Known Vulnerabilities](https://snyk.io/test/github/pixelit-project/node-red-contrib-pixelit/badge.svg)](https://snyk.io/test/github/pixelit-project/node-red-contrib-pixelit)
 
 [Node-RED](https://nodered.org/) nodes to control the [PixelIt](https://github.com/pixelit-project/PixelIt) easily and comfortably.
+
+## Requirements and installation
+
+Use Node.js 22 or newer and Node-RED 2 or newer. Install `node-red-contrib-pixelit`
+through **Manage palette → Install**, then restart Node-RED. Alternatively, run
+this in your Node-RED user directory (usually `~/.node-red`):
+
+```sh
+npm install node-red-contrib-pixelit
+```
+
+## Quick start
+
+Import [examples/quick-start.json](examples/quick-start.json) through the Node-RED
+Import dialog. Set your PixelIt device's IP address in the Core node, deploy,
+and click **Display text**. This sends a five-second text alert through HTTP.
+The Debug node shows the outgoing MQTT message.
+
+For MQTT, connect Core's output to an MQTT Out node configured to use
+`msg.topic`, and set Core's Master-Topic to the topic configured on your PixelIt.
+The IP address is optional when using MQTT only. Both transports are used when
+an IP and an MQTT output connection are configured. Enter your PixelIt UUID in
+Core when downloading bitmap IDs from the bitmap API.
+
+Text fields that support message references accept values such as
+`{{msg.payload}}` or `{{msg.payload.seconds}}`.
+
+To rotate screens, use **Screen Init → Text/Clock/Bitmap → Screen Data Update →
+Core** to store each named screen. Then send an array such as
+`[{"screenName":"weather"},{"screenName":"clock"}]` through **Playlist Update →
+Core**. An empty array stops rotation. Each screen needs a positive duration in
+seconds, at most 2147483. Invalid playlists are rejected without replacing the
+current playlist. Alerts temporarily interrupt rotation; sleep mode pauses it.
+
+## Existing MQTT passwords
+
+Matrix Config now stores its MQTT password using Node-RED credentials. Existing
+flows continue to work using their legacy password. Open each existing Matrix
+Config node, save it with **Done**, and deploy to move its password out of the
+normal flow properties into credentials. Previously exported flows and backups
+may still contain the old password. Keep Node-RED's credential secret and
+credential store with your deployment backup; ordinary flow exports do not
+include the credential password.
+
+Matrix Config must still send the password to the device when applying its MQTT
+configuration. Its output messages therefore contain the password: avoid
+logging or exporting those messages.
+
+## Development
+
+```sh
+npm ci
+npm run check
+npm test
+```
+
+Checks cover runtime/editor JavaScript syntax and example JSON. Regression tests
+use an isolated Node-RED stub, fake timers and mocked HTTP calls to exercise
+playlist validation, shutdown, failed bitmap downloads, message references and
+credential migration. CI runs them on Node.js 22 and 24, and the release workflow
+runs them before publishing. Hardware and editor integration should also be
+checked in a real Node-RED installation before release.
 
 ## Example
 
 ![Example](https://www.bastelbunker.de/Pixelit_nodered.png)
 
 ## Changelog
+
+### Unreleased
+
+- Stop playlist timers and suppress late sends when Core is closed.
+- Validate playlists and durations; allow an empty playlist to stop rotation.
+- Fix dynamic Clock/Sound values and bitmap download error handling.
+- Store Matrix Config MQTT passwords in Node-RED credentials with legacy migration.
+- Require Node.js 22+, add regression tests, CI checks and an importable example.
 
 ### 0.4.0 (2024-10-07)
 

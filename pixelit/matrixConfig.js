@@ -17,12 +17,16 @@ module.exports = (red) => {
             msg.mqttServer = config.mqttServer;
             msg.mqttPort = config.mqttPort;
             msg.mqttUser = config.mqttUser;
-            msg.mqttPassword = config.mqttPassword;
+            // Legacy flows remain usable until the node is saved in the editor.
+            msg.mqttPassword = node.credentials && node.credentials.mqttPassword !== undefined
+                ? node.credentials.mqttPassword : config.mqttPassword;
             msg.mqttMasterTopic = config.mqttMasterTopic;           
 
             node.send(msg)
         });
     }
 
-    red.nodes.registerType("Matrix Config", matrixConfig);
+    red.nodes.registerType("Matrix Config", matrixConfig, {
+        credentials: { mqttPassword: { type: "password" } }
+    });
 }

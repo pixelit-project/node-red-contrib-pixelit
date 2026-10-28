@@ -48,14 +48,21 @@
                 value: "",
                 required: false
             },
-            mqttPassword: {
-                value: "",
-                required: false
-            },
             mqttMasterTopic: {
                 value: "",
                 required: false
             }
+        },
+        credentials: {
+            mqttPassword: { type: "password" }
+        },
+        oneditprepare: function () {
+            if (this.mqttPassword && !(this.credentials && this.credentials.has_mqttPassword)) {
+                $("#node-input-mqttPassword").val(this.mqttPassword);
+            }
+        },
+        oneditsave: function () {
+            delete this.mqttPassword;
         },
         inputs: 1,
         outputs: 1,
@@ -140,7 +147,7 @@
     </div>
     <div class="form-row">
         <label for="node-input-mqttPassword"><i class="icon-tag"></i> MQTT Password</label>
-        <input type="text" id="node-input-mqttPassword">
+        <input type="password" id="node-input-mqttPassword">
     </div>
     <div class="form-row">
         <label for="node-input-mqttServer"><i class="icon-tag"></i> MQTT Server</label>

@@ -9,7 +9,7 @@ module.exports = (red) => {
             msg.clock = {};
             msg.clock.show = true;
             msg.clock.switchAktiv = config.inswitchAktiv;
-            msg.clock.switchSec = tools.getValue(red, config.inswitchSec);
+            msg.clock.switchSec = tools.getValue(red, config.inswitchSec, msg);
             msg.clock.withSeconds = config.inwithSeconds;
             msg.clock.hexColor = tools.getValue(red, config.incolorHex, msg);
             msg.clock.color = {};

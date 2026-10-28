@@ -7,10 +7,10 @@ module.exports = (red) => {
         const node = this;
         this.on('input', function (msg) {
             msg.sound = {};
-            msg.sound.volume = Number(tools.getValue(red, config.inVolume));
-            msg.sound.control = tools.getValue(red, config.inControl);
-            msg.sound.folder = Number(tools.getValue(red, config.inFolder));
-            msg.sound.file = Number(tools.getValue(red, config.inFile));
+            msg.sound.volume = Number(tools.getValue(red, config.inVolume, msg));
+            msg.sound.control = tools.getValue(red, config.inControl, msg);
+            msg.sound.folder = Number(tools.getValue(red, config.inFolder, msg));
+            msg.sound.file = Number(tools.getValue(red, config.inFile, msg));
             node.send(msg)
         });
     }

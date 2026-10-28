@@ -1,0 +1,117 @@
+[
+  {
+    "id": "pixelit-example",
+    "type": "tab",
+    "label": "PixelIt quick start",
+    "disabled": false,
+    "info": "Set the PixelIt IP in Core. Inject Display text to send a five-second alert."
+  },
+  {
+    "id": "pixelit-inject",
+    "type": "inject",
+    "z": "pixelit-example",
+    "name": "Display text",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "Hello PixelIt!",
+    "payloadType": "str",
+    "x": 130,
+    "y": 100,
+    "wires": [
+      [
+        "pixelit-init"
+      ]
+    ]
+  },
+  {
+    "id": "pixelit-init",
+    "type": "Screen Init",
+    "z": "pixelit-example",
+    "name": "Five seconds",
+    "inscreenName": "hello",
+    "induration": "5",
+    "x": 330,
+    "y": 100,
+    "wires": [
+      [
+        "pixelit-text"
+      ]
+    ]
+  },
+  {
+    "id": "pixelit-text",
+    "type": "Text",
+    "z": "pixelit-example",
+    "name": "Message text",
+    "intextString": "{{msg.payload}}",
+    "inbigFont": "false",
+    "inscrollText": "auto",
+    "inscrollTextDelay": "110",
+    "incenterText": "true",
+    "inposX": "0",
+    "inposY": "1",
+    "incolorHex": "#FFFFFF",
+    "incolorR": "255",
+    "incolorG": "255",
+    "incolorB": "255",
+    "x": 520,
+    "y": 100,
+    "wires": [
+      [
+        "pixelit-alert"
+      ]
+    ]
+  },
+  {
+    "id": "pixelit-alert",
+    "type": "Alert Screen",
+    "z": "pixelit-example",
+    "name": "Display immediately",
+    "x": 730,
+    "y": 100,
+    "wires": [
+      [
+        "pixelit-core"
+      ]
+    ]
+  },
+  {
+    "id": "pixelit-core",
+    "type": "Core",
+    "z": "pixelit-example",
+    "name": "Set your PixelIt IP",
+    "ip": "",
+    "uuid": "",
+    "masterTopic": "pixelit",
+    "x": 960,
+    "y": 100,
+    "wires": [
+      [
+        "pixelit-debug"
+      ]
+    ]
+  },
+  {
+    "id": "pixelit-debug",
+    "type": "debug",
+    "z": "pixelit-example",
+    "name": "PixelIt MQTT message",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "x": 1220,
+    "y": 100,
+    "wires": []
+  }
+]
