@@ -90,6 +90,8 @@ unused legacy publishing tokens after confirming that it succeeded.
 
 ### Unreleased
 
+- Replace Axios with native fetch; abort HTTP requests after one second or on node close.
+
 - Stop playlist timers and suppress late sends when Core is closed.
 - Validate playlists and durations; allow an empty playlist to stop rotation.
 - Fix dynamic Clock/Sound values and bitmap download error handling.

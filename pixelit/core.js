@@ -1,7 +1,6 @@
 //@ts-check
 "use strict";
 const tools = require("./lib/tools");
-const axios = require("axios");
 const errorImage = '[64512,0,0,0,0,0,0,64512,0,64512,0,0,0,0,64512,0,0,0,64512,0,0,64512,0,0,0,0,0,64512,64512,0,0,0,0,0,0,64512,64512,0,0,0,0,0,64512,0,0,64512,0,0,0,64512,0,0,0,0,64512,0,64512,0,0,0,0,0,0,64512]';
 
 module.exports = (red) => {
@@ -10,6 +9,26 @@ module.exports = (red) => {
         red.nodes.createNode(this, config);
         const context = this.context();
         const node = this;
+
+        const shutdown = new AbortController();
+        async function request(url, body) {
+            const response = await fetch(url, {
+                method: body === undefined ? "GET" : "POST",
+                headers: {
+                    "User-Agent": "Node_Red_Core",
+                    "Content-type": "application/json; charset=utf-8",
+                },
+                body: body === undefined ? undefined : typeof body === "string" ? body : JSON.stringify(body),
+                signal: AbortSignal.any([shutdown.signal, AbortSignal.timeout(1000)]),
+            });
+            if (!response.ok) {
+                await response.body?.cancel();
+                throw new Error(`HTTP ${response.status}`);
+            }
+            // Read the body before finishing so the timeout also covers slow responses.
+            if (body === undefined) return response.json();
+            await response.text();
+        }
 
         let closed = false;
         let timeout;
@@ -26,6 +45,7 @@ module.exports = (red) => {
         }
         this.on("close", () => {
             closed = true;
+            shutdown.abort();
             stopTimer();
         });
 
@@ -95,14 +115,14 @@ module.exports = (red) => {
                             shape: "ring",
                             text: "Sleep Mode Active!",
                         });
-                        sendToPixelItScreen(await createScreenJson(msg));
+                        await sendToPixelItScreen(await createScreenJson(msg));
                     } else if (msg.sleepMode != undefined && tools.booleanConvert(msg.sleepMode) == false) {
                         sleepModeActive = false;
                         context.set("sleepModeActive", sleepModeActive);
-                        sendToPixelItScreen(await createScreenJson(msg));
+                        await sendToPixelItScreen(await createScreenJson(msg));
                         getNextScreen();
                     } else if (sleepModeActive == false) {
-                        sendToPixelItScreen(await createScreenJson(msg));
+                        await sendToPixelItScreen(await createScreenJson(msg));
                     }
                 }
 
@@ -121,7 +141,7 @@ module.exports = (red) => {
                         shape: "ring",
                         text: "Matrix Config send",
                     });
-                    sendToPixelItConfig(createConfigJson(msg));
+                    await sendToPixelItConfig(createConfigJson(msg));
                 }
 
                 // This topic is sent when the play is updated
@@ -170,7 +190,7 @@ module.exports = (red) => {
                         text: status,
                     });
 
-                    sendToPixelItScreen(await createScreenJson(msg));
+                    await sendToPixelItScreen(await createScreenJson(msg));
                 }
 
                 async function getNextScreen() {
@@ -228,7 +248,7 @@ module.exports = (red) => {
                     schedule(getNextScreen, Number(nextScreen.duration) * 1000);
                     try {
                         const nextScreenJson = await createScreenJson(nextScreen);
-                        sendToPixelItScreen(nextScreenJson);
+                        await sendToPixelItScreen(nextScreenJson);
                     } catch (error) {
                         node.error(error);
                         node.status({
@@ -394,14 +414,9 @@ module.exports = (red) => {
 
                     if (sendOverHTTPActive) {
                         try {
-                            await axios.post(`http://${config.ip}/api/config`, myjson, {
-                                headers: {
-                                    "User-Agent": "Node_Red_Core",
-                                    "Content-type": "application/json; charset=utf-8",
-                                },
-                                timeout: 1000,
-                            });
+                            await request(`http://${config.ip}/api/config`, myjson);
                         } catch (error) {
+                            if (closed) return;
                             node.status({
                                 fill: "yellow",
                                 shape: "dot",
@@ -422,14 +437,9 @@ module.exports = (red) => {
 
                     if (sendOverHTTPActive) {
                         try {
-                            await axios.post(`http://${config.ip}/api/screen`, myjson, {
-                                headers: {
-                                    "User-Agent": "Node_Red_Core",
-                                    "Content-type": "application/json; charset=utf-8",
-                                },
-                                timeout: 1000,
-                            });
+                            await request(`http://${config.ip}/api/screen`, myjson);
                         } catch (error) {
+                            if (closed) return;
                             node.status({
                                 fill: "yellow",
                                 shape: "dot",
@@ -457,15 +467,9 @@ module.exports = (red) => {
                         }
 
                         try {
-                            const res = await axios.get(`https://pixelit.bastelbunker.de/API/GetBMPByID/${input}?uuid=${uuid}`, {
-                                headers: {
-                                    "User-Agent": "Node_Red_Core",
-                                    "Content-type": "application/json; charset=utf-8",
-                                },
-                                timeout: 1000,
-                            });
-                            webResult = res.data;
+                            webResult = await request(`https://pixelit.bastelbunker.de/API/GetBMPByID/${input}?uuid=${uuid}`);
                         } catch (error) {
+                            if (closed) return;
                             node.status({
                                 fill: "red",
                                 shape: "dot",

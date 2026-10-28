@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
 
-function build(file, config = {}, credentials, axios = {}) {
+function build(file, config = {}, credentials, fetchImpl = async () => { throw new Error("Unexpected HTTP request"); }) {
     let Constructor, registration;
     const handlers = {}, store = new Map(), timers = new Map();
     const sent = [], errors = [], statuses = [];
@@ -27,7 +27,8 @@ function build(file, config = {}, credentials, axios = {}) {
     const source = fs.readFileSync(path.join(__dirname, '../pixelit', file), 'utf8');
     const sandbox = {
         module: { exports: {} }, console: { log() {} },
-        require: name => name === 'axios' ? axios : require('../pixelit/lib/tools'),
+        require: () => require('../pixelit/lib/tools'),
+        fetch: fetchImpl, AbortController, AbortSignal,
         setTimeout(fn, delay) { const id = ++timerId; timers.set(id, { fn, delay }); return id; },
         clearTimeout: id => timers.delete(id)
     };
@@ -71,10 +72,10 @@ test('close clears timers and prevents callbacks from sending again', async () =
 
 test('close during an icon request prevents late sends', async () => {
     let resolve;
-    const n = build('core.js', {}, undefined, { get: () => new Promise(r => { resolve = r; }) });
+    const n = build('core.js', {}, undefined, () => new Promise(r => { resolve = r; }));
     const pending = n.handlers.input({ topic: 'alert_screen', duration: 2, bitmap: { data: 42 } });
     n.handlers.close();
-    resolve({ data: { id: 42, rgB565Array: '[1,2]' } });
+    resolve(new Response(JSON.stringify({ id: 42, rgB565Array: '[1,2]' })));
     await pending;
     assert.equal(n.sent.length, 0);
     assert.equal(n.timers.size, 0);
@@ -93,7 +94,7 @@ test('invalid alert durations are reported through done without scheduling', asy
 
 for (const response of [null, {}, { id: 0 }, { id: 42 }]) {
     test(`malformed bitmap response ${JSON.stringify(response)} uses fallback`, async () => {
-        const n = build('core.js', {}, undefined, { get: async () => ({ data: response }) });
+        const n = build('core.js', {}, undefined, async () => new Response(JSON.stringify(response)));
         await n.handlers.input({ topic: 'matrix_control', switchAnimation: { aktiv: true, data: 42 } });
         assert.equal(n.errors.length, 0);
         assert.equal(JSON.parse(n.sent[0].payload).switchAnimation.data.length, 64);
@@ -102,7 +103,7 @@ for (const response of [null, {}, { id: 0 }, { id: 42 }]) {
 
 test('failed bitmap downloads use fallback and can be retried', async () => {
     let calls = 0;
-    const n = build('core.js', {}, undefined, { get: async () => { calls++; throw new Error('offline'); } });
+    const n = build('core.js', {}, undefined, async () => { calls++; throw new Error('offline'); });
     for (let i = 0; i < 2; i++) {
         await n.handlers.input({ topic: 'matrix_control', switchAnimation: { aktiv: true, data: 42 } });
     }
@@ -113,7 +114,7 @@ test('failed bitmap downloads use fallback and can be retried', async () => {
 
 test('valid bitmap downloads are cached', async () => {
     let calls = 0;
-    const n = build('core.js', {}, undefined, { get: async () => { calls++; return { data: { id: 42, rgB565Array: '[1,2]' } }; } });
+    const n = build('core.js', {}, undefined, async () => { calls++; return new Response(JSON.stringify({ id: 42, rgB565Array: '[1,2]' })); });
     for (let i = 0; i < 2; i++) await n.handlers.input({ topic: 'matrix_control', bitmap: { data: 42 } });
     assert.equal(calls, 1);
     assert.deepEqual(JSON.parse(n.sent[1].payload).bitmap.data, [1, 2]);
@@ -175,15 +176,83 @@ test('sleep pauses rotation, completes input and wake resumes playback', async (
 
 test('configured HTTP transport receives screens and configuration', async () => {
     const calls = [];
-    const n = build('core.js', { ip: '192.0.2.1', masterTopic: 'pixelit/' }, undefined, {
-        post: async (...args) => calls.push(args)
-    });
+    const n = build('core.js', { ip: '192.0.2.1', masterTopic: 'pixelit/' }, undefined, async (...args) => { calls.push(args); return new Response('OK'); });
     await n.handlers.input({ topic: 'matrix_control', brightness: '20' });
     await n.handlers.input({ topic: 'matrix_config', mqttPassword: 'secret', matrixtBrightness: '85', matrixType: '1' });
     assert.equal(calls[0][0], 'http://192.0.2.1/api/screen');
-    assert.equal(JSON.parse(calls[0][1]).brightness, 20);
+    assert.equal(JSON.parse(calls[0][1].body).brightness, 20);
     assert.equal(calls[1][0], 'http://192.0.2.1/api/config');
-    assert.equal(calls[1][1].mqttPassword, 'secret');
+    assert.equal(JSON.parse(calls[1][1].body).mqttPassword, 'secret');
     assert.equal(n.sent[0].topic, 'pixelit/setScreen');
     assert.equal(n.sent[1].topic, 'pixelit/setConfig');
+});
+
+for (const topic of ['matrix_control', 'matrix_config']) {
+    test(`${topic}: HTTP errors set warning status while MQTT still sends`, async () => {
+        let cancelled = false;
+        const n = build('core.js', { ip: '192.0.2.1' }, undefined, async () => ({
+            ok: false, status: 500, body: { cancel: async () => { cancelled = true; } }
+        }));
+        await n.handlers.input({ topic });
+        assert.equal(cancelled, true);
+        assert.equal(n.sent.length, 1);
+        assert.equal(n.statuses.at(-1).fill, 'yellow');
+        assert.equal(n.errors.length, 0);
+    });
+}
+
+test('bitmap HTTP errors and invalid JSON use fallback without caching', async () => {
+    for (const response of [() => new Response('Not found', { status: 404 }), () => new Response('invalid JSON')]) {
+        let calls = 0;
+        const n = build('core.js', {}, undefined, async () => { calls++; return response(); });
+        for (let i = 0; i < 2; i++) await n.handlers.input({ topic: 'matrix_control', bitmap: { data: 42 } });
+        assert.equal(calls, 2);
+        assert.equal(JSON.parse(n.sent[0].payload).bitmap.data.length, 64);
+        assert.equal(n.errors.length, 0);
+    }
+});
+
+function untilAborted(signal) {
+    return new Promise((resolve, reject) => {
+        if (signal.aborted) reject(signal.reason);
+        else signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+    });
+}
+
+test('one-second timeout also aborts a stalled response body', async () => {
+    let signal;
+    const n = build('core.js', {}, undefined, async (url, options) => {
+        signal = options.signal;
+        return { ok: true, json: () => untilAborted(signal) };
+    });
+    // Native timeout signals do not keep the event loop alive by themselves.
+    const keepAlive = setTimeout(() => {}, 2000);
+    try {
+        await n.handlers.input({ topic: 'matrix_control', bitmap: { data: 42 } });
+        assert.equal(signal.aborted, true);
+        assert.equal(signal.reason.name, 'TimeoutError');
+        assert.equal(JSON.parse(n.sent[0].payload).bitmap.data.length, 64);
+    } finally {
+        clearTimeout(keepAlive);
+    }
+});
+
+test('close aborts concurrent HTTP requests without warning statuses or late sends', async () => {
+    const signals = [];
+    const n = build('core.js', { ip: '192.0.2.1' }, undefined, (url, options) => {
+        signals.push(options.signal);
+        return untilAborted(options.signal);
+    });
+    const bitmap = n.handlers.input({ topic: 'alert_screen', duration: 2, bitmap: { data: 42 } });
+    const config = n.handlers.input({ topic: 'matrix_config' });
+    assert.equal(signals.length, 2);
+    const statusesBeforeClose = n.statuses.length;
+    const sentBeforeClose = n.sent.length;
+    n.handlers.close();
+    await Promise.all([bitmap, config]);
+    assert.ok(signals.every(signal => signal.aborted));
+    assert.equal(n.statuses.length, statusesBeforeClose);
+    assert.equal(n.sent.length, sentBeforeClose);
+    assert.equal(n.timers.size, 0);
+    assert.equal(n.errors.length, 0);
 });
