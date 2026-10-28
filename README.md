@@ -111,12 +111,11 @@ unused legacy publishing tokens after confirming that it succeeded.
 
 ## Changelog
 
-### Unreleased
+### 0.5.1 (2026-10-28)
 
 -   (o0shojo0o) Bound the bitmap cache to 100 entries / 1 MiB with least-recently-used eviction.
 -   (o0shojo0o) Cancel superseded screen requests and discard stale responses and error statuses.
 -   (o0shojo0o) Distinguish HTTP errors, timeouts, connection failures and invalid bitmap responses in node status and logs.
-
 -   (o0shojo0o) Add example flows covering all 14 nodes and validate example coverage automatically.
 
 ### 0.5.0 (2026-10-28)
