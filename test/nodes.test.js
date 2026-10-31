@@ -428,3 +428,45 @@ test('diagnostics distinguish HTTP, timeout, connection and invalid JSON without
         assert.equal(n.statuses.at(-1).text, n.warnings[0]);
     }
 });
+
+for (const width of [8, 32]) {
+    test(`automatically detects ${width}x8 inline animations without size configuration`, async () => {
+        const frames = [Array(width * 8).fill(63488), Array(width * 8).fill(2016)];
+        const animation = build('bitmapAnimation.js', {
+            indata: '{{msg.frames}}', inanimationDelay: '100',
+            inrubberbanding: 'false', inlimitLoops: '0'
+        });
+        animation.handlers.input({ frames: frames.map(frame => JSON.stringify(frame)).join(',') });
+        const core = build('core.js');
+        await core.handlers.input({ ...animation.sent[0], topic: 'matrix_control' });
+        const output = JSON.parse(core.sent[0].payload).bitmapAnimation;
+        assert.deepEqual(output.size, { width, height: 8 });
+        assert.deepEqual(output.data, frames);
+    });
+
+    test(`automatically detects ${width}x8 gallery animations, including cached responses`, async () => {
+        const frames = [Array(width * 8).fill(31), Array(width * 8).fill(65535)];
+        let calls = 0;
+        const core = build('core.js', {}, undefined, async () => {
+            calls++;
+            return new Response(JSON.stringify({
+                id: 42, rgB565Array: frames.map(frame => JSON.stringify(frame)).join(',')
+            }));
+        });
+        for (let i = 0; i < 2; i++) {
+            await core.handlers.input({ topic: 'matrix_control', bitmapAnimation: { data: 42, animationDelay: '100' } });
+            const output = JSON.parse(core.sent.at(-1).payload).bitmapAnimation;
+            assert.deepEqual(output.size, { width, height: 8 });
+            assert.deepEqual(output.data, frames);
+        }
+        assert.equal(calls, 1);
+    });
+}
+
+test('failed animation downloads use the 8x8 fallback dimensions', async () => {
+    const core = build('core.js');
+    await core.handlers.input({ topic: 'matrix_control', bitmapAnimation: { data: 42, animationDelay: '100' } });
+    const output = JSON.parse(core.sent[0].payload).bitmapAnimation;
+    assert.deepEqual(output.size, { width: 8, height: 8 });
+    assert.equal(output.data[0].length, 64);
+});

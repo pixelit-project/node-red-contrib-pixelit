@@ -364,6 +364,10 @@ module.exports = (red) => {
                     }
                     // BitmapAnimation Overrides
                     if (jsonObj.bitmapAnimation) {
+                        if (jsonObj.bitmapAnimation.position) {
+                            jsonObj.bitmapAnimation.position.x = Number(jsonObj.bitmapAnimation.position.x);
+                            jsonObj.bitmapAnimation.position.y = Number(jsonObj.bitmapAnimation.position.y);
+                        }
                         if (!jsonObj.bitmapAnimation.limitLoops) {
                             jsonObj.bitmapAnimation.limitLoops = 0;
                         }
@@ -374,6 +378,11 @@ module.exports = (red) => {
                             jsonObj.bitmapAnimation.data = JSON.parse(`[${errorImage}]`);
                         }
 
+                        const frames = jsonObj.bitmapAnimation.data;
+                        jsonObj.bitmapAnimation.size = {
+                            width: frames.length > 0 && frames.every(frame => Array.isArray(frame) && frame.length === 256) ? 32 : 8,
+                            height: 8
+                        };
                         jsonObj.bitmapAnimation.animationDelay = Number(jsonObj.bitmapAnimation.animationDelay);
                     }
                     // Sound Overrides
