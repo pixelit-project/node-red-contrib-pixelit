@@ -111,6 +111,10 @@ unused legacy publishing tokens after confirming that it succeeded.
 
 ## Changelog
 
+### 0.5.3 (2026-10-31)
+
+-   (o0shojo0o) Automatically detect 8×8 and 32×8 bitmap animation dimensions in Core from the pixels per frame, including gallery downloads and cached animations. No manual size configuration is needed.
+
 ### 0.5.2 (2026-10-28)
 
 -   (o0shojo0o) Keep PixelIt HTTP failures visible in node status without repeated debug warnings; log each outage and recovery once per screen/config endpoint. Bitmap errors remain warnings. Fixes [#90](https://github.com/pixelit-project/node-red-contrib-pixelit/issues/90).
