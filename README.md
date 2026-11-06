@@ -56,6 +56,16 @@ node using `msg.topic` to control a device. `npm run check` checks JSON, wire
 references and coverage of all registered non-config node types, including nested
 example directories.
 
+## Screen transitions
+
+In the Animations example, open **Switch Animation**, turn it **On** and select
+**Curtain**, **Pixel Dissolve**, **Slide**, **Blinds**, **CRT** or **Glitch** under
+**Animation style**. Deploy the flow and trigger the example. These six styles
+require compatible PixelIt firmware. With firmware that supports the expanded
+**Random** mix, a screen message can also select any of the six new styles.
+Older firmware keeps its original mix of Fade, Colored Bar Wipe and Zig Zag Wipe.
+Choose **Bitmap Wipe** explicitly to supply its bitmap.
+
 ## Existing MQTT passwords
 
 Matrix Config now stores its MQTT password using Node-RED credentials. Existing
