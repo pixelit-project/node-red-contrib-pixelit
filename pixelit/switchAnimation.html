@@ -65,6 +65,7 @@
             <option value="blinds">Blinds</option>
             <option value="crt">CRT</option>
             <option value="glitch">Glitch</option>
+            <option value="verticalSlide">Vertical Slide</option>
             <option value="random">Random (device firmware selection)</option>
           </select>
     </div>
@@ -102,6 +103,6 @@
 
 <script type="text/x-red" data-help-name="Switch Animation">
     <p>Curtain, Pixel Dissolve, Slide, Blinds, CRT and Glitch require PixelIt firmware with support for the new transitions.</p>
-    <p>Random uses the device firmware's mix. Firmware with the expanded mix can select all six new styles when the message includes screen content. Select Bitmap Wipe explicitly to supply its bitmap.</p>
+    <p>Random uses the device firmware's mix. Firmware with the expanded mix can select Vertical Slide and the other screen transitions when the message includes screen content. Vertical Slide requires a screen payload and firmware that supports it. Select Bitmap Wipe explicitly to supply its bitmap.</p>
     <p>For more information please visit the <a href="https://www.bastelbunker.de/pixel-it/">Blog</a>, <a href="https://pixelit-project.github.io/nodered.html#switch-animation">Documentation</a> or <a href="https://github.com/pixelit-project/PixelIt/discussions">Forum</a></p>    
 </script>
