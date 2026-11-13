@@ -122,6 +122,11 @@ unused legacy publishing tokens after confirming that it succeeded.
 
 ## Changelog
 
+### 0.6.0 (2026-11-13)
+
+-   (o0shojo0o) Add Curtain, Pixel Dissolve, Slide, Blinds, CRT, Glitch and Vertical Slide to the Switch Animation editor. These transitions require compatible PixelIt firmware; Vertical Slide also requires a screen payload.
+-   (o0shojo0o) Clarify firmware-dependent Random selection in the editor, node help and README. Compatible firmware can include the new transitions when the message contains screen content; Bitmap Wipe must be selected explicitly.
+
 ### 0.5.3 (2026-10-31)
 
 -   (o0shojo0o) Automatically detect 8×8 and 32×8 bitmap animation dimensions in Core from the pixels per frame, including gallery downloads and cached animations. No manual size configuration is needed.
